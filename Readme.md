@@ -1,2 +1,2 @@
 # RE--
-A simple Regular expressions constructor.
+A simple Regular expression engine.
