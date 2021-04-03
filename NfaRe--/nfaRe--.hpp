@@ -9,7 +9,8 @@
 namespace nfaRE
 {
 
-#define catenate ('.')
+// #define catenate ('.') // assume dot('.') as an explicit concatenation operator.
+#define catenate ((char)(20))
 class RE
 {
   private:

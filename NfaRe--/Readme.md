@@ -32,3 +32,8 @@ ab.c    numAtom = 2
 [代码见此](test\rexToPostRexTest.cc)
 
 [正则样例](test\rexTest.txt)
+
+### 2.从后缀表达式生成nfa状态
+原文中的`Ptrlist`共用体对我来说实在是有点绕,貌似是
+
+### 3.模拟nfa状态转移
