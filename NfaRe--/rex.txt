@@ -12,3 +12,4 @@ asd(as?d|f*)
 dsaf(a*d|b?d|c+d)?*
 (a|(b*h+d?|h?d?d+d*)+)asdf
 (b?c+|a*(bcd?e)|dfsd|csd|(asdf?(asdf)+)|cd)(asdf)
+a|b|c|d|e

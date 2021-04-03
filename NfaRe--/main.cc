@@ -19,13 +19,13 @@ string rexToPostRex(const string& rex)
     auto pb      = [&res](char ch) { res.push_back(ch); };
     auto invaild = [&rex]() { throw std::invalid_argument("Invalid Regex:" + rex); };
     stack<pair<int, int>> paren;
-    int numAtom = 0 /* [0,2] */, numAlt = 0; /* | 的个数*/
+    int numAtom = 0 /* 当前正则块的个数 [0-2]*/, numAlt = 0; /* | 的个数*/
     for (auto&& i : rex)
     {
         switch (i)
         {
         case '(':
-            if (numAtom > 1)
+            if (numAtom == 2)
             {
                 numAtom--;
                 pb(connect);
@@ -34,14 +34,13 @@ string rexToPostRex(const string& rex)
             numAtom = numAlt = 0;
             break;
         case ')':
-            if (numAtom == 0)
+            if (numAtom == 0 or paren.empty())
                 invaild();
-            while (--numAtom > 0)
+            if (numAtom == 2)
                 pb(connect);
+            numAtom = 0;
             while (numAlt-- > 0)
                 pb('|');
-            if (paren.empty())
-                invaild();
             tie(numAtom, numAlt) = paren.top();
             paren.pop();
             numAtom++;
@@ -49,8 +48,9 @@ string rexToPostRex(const string& rex)
         case '|':
             if (numAtom == 0)
                 invaild();
-            while (--numAtom > 0)
+            if (numAtom == 2)
                 pb(connect);
+            numAtom = 0;
             numAlt++;
             break;
         case '*':
@@ -61,7 +61,7 @@ string rexToPostRex(const string& rex)
             pb(i);
             break;
         default:
-            if (numAtom > 1)
+            if (numAtom == 2)
             {
                 numAtom--;
                 pb(connect);
@@ -73,7 +73,7 @@ string rexToPostRex(const string& rex)
     }
     if (numAtom == 0 or not paren.empty())
         invaild();
-    while (--numAtom > 0)
+    if (numAtom == 2)
         pb(connect);
     while (numAlt-- > 0)
         pb('|');
