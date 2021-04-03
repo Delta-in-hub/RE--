@@ -5,76 +5,79 @@
 #include <stack>
 #include <stdexcept>
 #include <string>
+#include <tuple>
+#include <utility>
 #define debug(x) std::cout << #x << " is\t" << (x) << '\n';
 
 using namespace std;
+
+constexpr char connect = '.';
+
 string rexToPostRex(const string& rex)
 {
-    string result;
-    if (rex.empty())
-        return result;
-    const char connectChar = '.';
-    stack<char> opStack;
-    auto invalidRex = []() { throw std::logic_error("Invaild RegExp"); };
-    auto popBack    = [&opStack, &result](char op) {
-        while (not opStack.empty() and opStack.top() == op)
-        {
-            result.push_back(opStack.top());
-            opStack.pop();
-        }
-    };
-    bool isFirstChar    = true;
-    bool isFirstbracket = true;
+    string res;
+    auto pb      = [&res](char ch) { res.push_back(ch); };
+    auto invaild = [&rex]() { throw std::invalid_argument("Invalid Regex:" + rex); };
+    stack<pair<int, int>> paren;
+    int numAtom = 0 /* [0,2] */, numAlt = 0; /* | 的个数*/
     for (auto&& i : rex)
     {
         switch (i)
         {
-        case '?':
-        case '*':
-        case '+':
-            result.push_back(i);
-            popBack(connectChar);
-            break;
         case '(':
-            if (not result.empty())
-                isFirstbracket = false;
-            popBack(connectChar);
-            if (isFirstbracket)
-                isFirstbracket = false;
-            else
-                opStack.push(connectChar);
-            opStack.push(i);
-            isFirstChar = true;
-            break;
-        case '|':
-            popBack(connectChar);
-            opStack.push(i);
-            isFirstChar = true;
+            if (numAtom > 1)
+            {
+                numAtom--;
+                pb(connect);
+            }
+            paren.push({numAtom, numAlt});
+            numAtom = numAlt = 0;
             break;
         case ')':
-            while (not opStack.empty() and opStack.top() != '(')
-            {
-                result.push_back(opStack.top());
-                opStack.pop();
-            }
-            opStack.pop();
+            if (numAtom == 0)
+                invaild();
+            while (--numAtom > 0)
+                pb(connect);
+            while (numAlt-- > 0)
+                pb('|');
+            if (paren.empty())
+                invaild();
+            tie(numAtom, numAlt) = paren.top();
+            paren.pop();
+            numAtom++;
+            break;
+        case '|':
+            if (numAtom == 0)
+                invaild();
+            while (--numAtom > 0)
+                pb(connect);
+            numAlt++;
+            break;
+        case '*':
+        case '+':
+        case '?':
+            if (numAtom == 0)
+                invaild();
+            pb(i);
             break;
         default:
-            popBack(connectChar);
-            if (isFirstChar)
-                isFirstChar = false;
-            else
-                opStack.push(connectChar);
-            result.push_back(i);
+            if (numAtom > 1)
+            {
+                numAtom--;
+                pb(connect);
+            }
+            pb(i);
+            numAtom++;
             break;
         }
     }
-    while (not opStack.empty())
-    {
-        result.push_back(opStack.top());
-        opStack.pop();
-    }
-    return result;
+    if (numAtom == 0 or not paren.empty())
+        invaild();
+    while (--numAtom > 0)
+        pb(connect);
+    while (numAlt-- > 0)
+        pb('|');
+    return res;
 }
 
 char* re2post(const char* re)
@@ -167,12 +170,22 @@ signed main(void)
     string tmp;
     while (f >> tmp)
     {
-        if (rexToPostRex(tmp) != re2post(tmp.data()))
+        char* res   = re2post(tmp.data());
+        string res2 = rexToPostRex(tmp);
+        if (res)
+        {
+            if (string(res) != res2)
+            {
+                debug(tmp);
+                debug(rexToPostRex(tmp));
+                debug(re2post(tmp.data()));
+            }
+        }
+        else if (not res2.empty())
         {
             debug(tmp);
             debug(rexToPostRex(tmp));
             debug(re2post(tmp.data()));
-            break;
         }
     }
     return 0;

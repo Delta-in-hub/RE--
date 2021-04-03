@@ -8,7 +8,7 @@ asd(as?d|f*)
 (a|b|c|d)
 (a)
 (((a)))
-((()))
 (((a)))(d)(b)
 dsaf(a*d|b?d|c+d)?*
 (a|(b*h+d?|h?d?d+d*)+)asdf
+(b?c+|a*(bcd?e)|dfsd|csd|(asdf?(asdf)+)|cd)(asdf)
