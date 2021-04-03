@@ -80,6 +80,7 @@ string rexToPostRex(const string& rex)
     return res;
 }
 
+//From https://swtch.com/~rsc/regexp/nfa.c.txt
 char* re2post(const char* re)
 {
     int nalt, natom;
@@ -166,7 +167,7 @@ char* re2post(const char* re)
 
 signed main(void)
 {
-    ifstream f("rex.txt");
+    ifstream f("rextest.txt");
     string tmp;
     while (f >> tmp)
     {
