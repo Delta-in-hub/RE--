@@ -11,7 +11,7 @@
 
 using namespace std;
 
-constexpr char connect = '.';
+constexpr char catenate = '.';
 
 string rexToPostRex(const string& rex)
 {
@@ -28,7 +28,7 @@ string rexToPostRex(const string& rex)
             if (numAtom == 2)
             {
                 numAtom--;
-                pb(connect);
+                pb(catenate);
             }
             paren.push({numAtom, numAlt});
             numAtom = numAlt = 0;
@@ -37,7 +37,7 @@ string rexToPostRex(const string& rex)
             if (numAtom == 0 or paren.empty())
                 invaild();
             if (numAtom == 2)
-                pb(connect);
+                pb(catenate);
             numAtom = 0;
             while (numAlt-- > 0)
                 pb('|');
@@ -49,7 +49,7 @@ string rexToPostRex(const string& rex)
             if (numAtom == 0)
                 invaild();
             if (numAtom == 2)
-                pb(connect);
+                pb(catenate);
             numAtom = 0;
             numAlt++;
             break;
@@ -64,7 +64,7 @@ string rexToPostRex(const string& rex)
             if (numAtom == 2)
             {
                 numAtom--;
-                pb(connect);
+                pb(catenate);
             }
             pb(i);
             numAtom++;
@@ -74,7 +74,7 @@ string rexToPostRex(const string& rex)
     if (numAtom == 0 or not paren.empty())
         invaild();
     if (numAtom == 2)
-        pb(connect);
+        pb(catenate);
     while (numAlt-- > 0)
         pb('|');
     return res;

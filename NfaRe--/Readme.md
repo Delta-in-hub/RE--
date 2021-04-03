@@ -31,5 +31,4 @@ ab.c    numAtom = 2
 
 [代码见此](test\rexToPostRexTest.cc)
 
-#### 样例
 [正则样例](test\rexTest.txt)

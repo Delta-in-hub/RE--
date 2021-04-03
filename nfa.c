@@ -18,8 +18,6 @@
 
 #define debug(x) printf("%s is %s\n", #x, (x));
 
-const char* str = "(((a)))(d)(b)";
-
 /*
  * Convert infix regexp re to postfix notation.
  * Insert . as explicit concatenation operator.
@@ -353,7 +351,7 @@ void step(List* clist, int c, List* nlist)
 /* Run NFA to determine whether it matches s. */
 int match(State* start, char* s)
 {
-    int i, c;
+    int  c;
     List *clist, *nlist, *t;
 
     clist = startlist(start, &l1);
@@ -371,11 +369,11 @@ int match(State* start, char* s)
 
 int main(int argc, char** argv)
 {
-    int i;
     char* post;
     State* start;
-    const char* tar = "\\a\\";
-    post            = re2post(str);
+    char* str = "abcd?(e|f)";
+    char* tar = "abcf";
+    post      = re2post(str);
     debug(post);
     if (post == NULL)
     {
