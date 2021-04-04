@@ -6,14 +6,14 @@
 #include <tuple>
 #include <unordered_set>
 
-namespace nfaRE
+namespace RE
 {
 
 // #define catenate ('.') // assume dot('.') as an explicit concatenation operator.
 #define catenate ((char)(20))
-class RE
+class nfaRE
 {
-  private:
+  protected:
     enum
     {
         Split = 256,
@@ -194,11 +194,11 @@ class RE
     }
 
   public:
-    RE(const std::string& rex)
+    nfaRE(const std::string& rex)
     {
         Start = postToNfa(rexToPostRex(rex));
     }
-    ~RE()
+    ~nfaRE()
     {
         next.clear();
         _delete(Start);
@@ -229,9 +229,9 @@ class RE
 };
 #undef catenate
 
-std::unordered_set<RE::State*> RE::now{};
-std::unordered_set<RE::State*> RE::next{};
+std::unordered_set<nfaRE::State*> nfaRE::now{};
+std::unordered_set<nfaRE::State*> nfaRE::next{};
 
-} // namespace nfaRE
+} // namespace RE
 
 #endif
