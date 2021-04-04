@@ -48,7 +48,7 @@ class dfaRE : protected RE::nfaRE
             for (auto&& j : dsta->n)
             {
                 if (j->c == i->c)
-                    addState2(j, arr);
+                    addState2(j->out, arr), addState2(j->out1, arr);
             }
             std::sort(begin(arr), end(arr));
             if (allState.find(arr) == allState.end())

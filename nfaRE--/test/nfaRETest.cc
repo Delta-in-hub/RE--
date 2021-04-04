@@ -33,6 +33,5 @@ signed main(void)
             debug(i), cnt2++;
     }
     cout << cnt2 << '/' << cnt1 << endl;
-    system("pause");
     return 0;
 }
