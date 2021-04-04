@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 using namespace std;
-#define debug(x) std::cout << #x << " is " << (x) << '\n';
+#define debug(x) std::cout << #x << " is " << (x) << '\n'
 
 signed main(void)
 {
@@ -25,10 +25,14 @@ signed main(void)
         "bcddhf",
         "abcddddd",
     };
+    int cnt1 = 0, cnt2 = 0;
     for (auto&& i : test)
     {
+        cnt1++;
         if (not re.match(i))
-            debug(i);
+            debug(i), cnt2++;
     }
+    cout << cnt2 << '/' << cnt1 << endl;
+
     return 0;
 }

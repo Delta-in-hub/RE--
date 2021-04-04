@@ -1,10 +1,10 @@
 #ifndef NFARE
 #define NFARE
-#include <set>
 #include <stack>
 #include <stdexcept>
 #include <string>
 #include <tuple>
+#include <unordered_set>
 
 namespace nfaRE
 {
@@ -26,6 +26,7 @@ class RE
         State* out;
         State* out1;
     } Accept{Match, nullptr, nullptr}, *Start;
+    static std::unordered_set<State*> now, next;
     struct Frag
     {
         State* head;
@@ -173,22 +174,23 @@ class RE
             pb('|');
         return res;
     }
-    void _delete(State* now, std::set<State*>& s)
+    void _delete(State* now)
     {
-        if (now == nullptr)
+
+        if (now == nullptr or now == &Accept or next.find(now) != next.end())
             return;
-        _delete(now->out, s);
-        _delete(now->out1, s);
-        s.insert(now);
+        next.insert(now);
+        _delete(now->out);
+        _delete(now->out1);
     }
-    void addState(State* s, std::set<State*>& now)
+    void addState(State* s, std::unordered_set<State*>& stateSet)
     {
         if (s == nullptr)
             return;
         if (s->c == Split or s->c == Merge)
-            addState(s->out, now), addState(s->out1, now);
+            addState(s->out, stateSet), addState(s->out1, stateSet);
         else
-            now.insert(s);
+            stateSet.insert(s);
     }
 
   public:
@@ -198,17 +200,17 @@ class RE
     }
     ~RE()
     {
-        std::set<State*> s;
-        _delete(Start, s);
-        for (auto&& i : s)
+        next.clear();
+        _delete(Start);
+        for (auto&& i : next)
         {
             delete i;
         }
+        next.clear();
     }
     bool match(const std::string& target)
     {
-        using namespace std;
-        set<State*> now, next;
+        now.clear(), next.clear();
         addState(Start, now);
         for (auto&& i : target)
         {
@@ -226,6 +228,9 @@ class RE
     }
 };
 #undef catenate
+
+std::unordered_set<RE::State*> RE::now{};
+std::unordered_set<RE::State*> RE::next{};
 
 } // namespace nfaRE
 
