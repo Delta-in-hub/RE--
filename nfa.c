@@ -371,8 +371,8 @@ int main(int argc, char** argv)
 {
     char* post;
     State* start;
-    char* str = "abcd?(e|f)";
-    char* tar = "abcf";
+    char* str = "a?b+c*((d+|e?))fh";
+    char* tar = "abcdfh";
     post      = re2post(str);
     debug(post);
     if (post == NULL)
@@ -392,6 +392,7 @@ int main(int argc, char** argv)
     l2.s = malloc(nstate * sizeof l2.s[0]);
 
     printf("%d\n", match(start, tar));
+    system("pause");
     return 0;
 }
 

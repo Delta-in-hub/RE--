@@ -1,4 +1,4 @@
-#include "../nfaRE--.hpp"
+#include "../dfaRE--.hpp"
 #include <cassert>
 #include <iostream>
 #include <string>
@@ -8,7 +8,7 @@ using namespace std;
 
 signed main(void)
 {
-    RE::nfaRE re("a?b+c*((d+|e?))fh");
+    RE::dfaRE re("a?b+c*((d+|e?))fh");
     vector<string> test{
         "bbbbccccdddddfh",
         "abbbefh",
@@ -33,6 +33,5 @@ signed main(void)
             debug(i), cnt2++;
     }
     cout << cnt2 << '/' << cnt1 << endl;
-    system("pause");
     return 0;
 }
