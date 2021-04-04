@@ -1,4 +1,4 @@
-#include "../nfaRe--.hpp"
+#include "../nfaRE--.hpp"
 #include <cassert>
 #include <iostream>
 #include <string>
