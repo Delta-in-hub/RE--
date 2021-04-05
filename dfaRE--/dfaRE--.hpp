@@ -7,7 +7,7 @@
 #include <vector>
 namespace RE
 {
-#define MAXDSTATE 32
+constexpr size_t MAXSTATELIMIT = 32;
 class dfaRE : protected RE::nfaRE
 {
   protected:
@@ -22,7 +22,7 @@ class dfaRE : protected RE::nfaRE
     {
         return new DState({{}, s, false});
     }
-
+    bool useNfa;
     std::map<std::vector<State*>, DState*> allState;
 
     void addState2(State* s, std::vector<State*>& stateSet)
@@ -37,6 +37,11 @@ class dfaRE : protected RE::nfaRE
 
     void buildDfa(DState* dsta)
     {
+        if (allState.size() > MAXSTATELIMIT)
+        {
+            useNfa = true;
+            return;
+        }
         static bool vis[256];
         memset(vis, 0, sizeof(vis));
         for (auto&& i : dsta->n)
@@ -51,7 +56,8 @@ class dfaRE : protected RE::nfaRE
                     addState2(j->out, arr), addState2(j->out1, arr);
             }
             std::sort(begin(arr), end(arr));
-            if (allState.find(arr) == allState.end())
+            auto pos = allState.find(arr);
+            if (pos == allState.end())
             {
                 DState* ndsta = dstate(arr);
                 allState.insert({std::move(arr), ndsta});
@@ -59,7 +65,7 @@ class dfaRE : protected RE::nfaRE
             }
             else
             {
-                dsta->m[i->c] = allState.at(arr);
+                dsta->m[i->c] = pos->second;
             }
         }
         dsta->searched = true;
@@ -74,22 +80,29 @@ class dfaRE : protected RE::nfaRE
     dfaRE(const std::string& rex)
         : nfaRE(rex)
     {
+        useNfa = false;
         std::vector<State*> arr;
         addState2(Start, arr);
         std::sort(begin(arr), end(arr));
         DStart = dstate(arr);
         allState.insert({std::move(arr), DStart});
         buildDfa(DStart);
+        if (useNfa)
+        {
+            for (auto&& i : allState)
+                delete i.second;
+            std::map<std::vector<State*>, DState*>().swap(allState);
+        }
     }
     ~dfaRE()
     {
         for (auto&& i : allState)
-        {
             delete i.second;
-        }
     }
     bool match(const std::string& str)
     {
+        if (useNfa)
+            return nfaRE::match(str);
         DState *now = DStart, *next;
         for (auto&& i : str)
         {
@@ -103,7 +116,6 @@ class dfaRE : protected RE::nfaRE
     }
 };
 
-#undef MAXDSTATE
 } // namespace RE
 
 #endif

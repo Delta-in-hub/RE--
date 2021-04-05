@@ -1,5 +1,6 @@
 #include "../dfaRE--.hpp"
 #include <cassert>
+#include <ctime>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -8,7 +9,6 @@ using namespace std;
 
 signed main(void)
 {
-    RE::dfaRE re("a?b+c*((d+|e?))fh");
     vector<string> test{
         "bbbbccccdddddfh",
         "abbbefh",
@@ -25,13 +25,20 @@ signed main(void)
         "bcddhf",
         "abcddddd",
     };
+    time_t _start = clock(), _end;
+    RE::dfaRE re("a?b+c*((d+|e?))fh");
     int cnt1 = 0, cnt2 = 0;
     for (auto&& i : test)
     {
         cnt1++;
         if (not re.match(i))
-            debug(i), cnt2++;
+        {
+            // debug(i);
+            cnt2++;
+        }
     }
+    _end = clock();
     cout << cnt2 << '/' << cnt1 << endl;
+    debug(_end - _start);
     return 0;
 }
