@@ -18,12 +18,17 @@ class dfaRE : protected RE::nfaRE
         bool searched;
     } * DStart;
 
-    DState* dstate(const std::vector<State*>& s)
-    {
-        return new DState({{}, s, false});
-    }
     bool useNfa;
-    std::map<std::vector<State*>, DState*> allDState;
+
+    struct mcmp
+    {
+        bool operator()(const std::vector<State*>* a, const std::vector<State*>* b) const
+        {
+            return *a < *b;
+        }
+    };
+
+    std::map<std::vector<State*>*, DState*, mcmp> allDState;
 
     void addState2(State* s, std::vector<State*>& stateSet)
     {
@@ -56,17 +61,18 @@ class dfaRE : protected RE::nfaRE
                     addState2(j->out, arr), addState2(j->out1, arr);
             }
             std::sort(begin(arr), end(arr));
-            auto pos = allDState.find(arr);
+            auto pos = allDState.find(&arr);
             if (pos == allDState.end())
             {
-                DState* ndsta = dstate(arr);
-                allDState.insert({std::move(arr), ndsta});
+                DState* ndsta = new DState({{}, std::move(arr), false});
+                allDState.insert({&(ndsta->n), ndsta});
                 dsta->m[i->c] = ndsta;
             }
             else
             {
                 dsta->m[i->c] = pos->second;
             }
+            arr.clear();
         }
         dsta->searched = true;
         for (auto&& i : dsta->m)
@@ -83,14 +89,14 @@ class dfaRE : protected RE::nfaRE
         std::vector<State*> arr;
         addState2(Start, arr);
         std::sort(begin(arr), end(arr));
-        DStart = dstate(arr);
-        allDState.insert({std::move(arr), DStart});
+        DStart = new DState({{}, std::move(arr), false});
+        allDState.insert({&(DStart->n), DStart});
         buildDfa(DStart);
         if (useNfa)
         {
             for (auto&& i : allDState)
                 delete i.second;
-            std::map<std::vector<State*>, DState*>().swap(allDState);
+            std::map<std::vector<State*>*, DState*, mcmp>().swap(allDState);
         }
     }
     ~dfaRE()

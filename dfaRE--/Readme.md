@@ -57,6 +57,7 @@ struct DState
 ## 与原文实现比较
 原文对于每个状态中,使用`DState* next[256]`去散列,而我使用`std::unordered_map<>`,不考虑内存对齐等等,两者大概在字符数为58时,占用内存相当.[测试见此](https://gist.github.com/Delta-in-hub/b4fb3e92c1b4901622c88fb41ec9ca30).
 
-原文直接在`DState`结构体上构建了一颗BST,而我对于每个`std::vector<State*>`在结构体中存了一遍,在`allDState`中又存了一遍.这个可以通过使用`std::vector<State*> *`做key,然后重载他的`std::less()`解决.
+~~原文直接在`DState`结构体上构建了一颗BST,而我对于每个`std::vector<State*>`在结构体中存了一遍,在`allDState`中又存了一遍.这个可以通过使用`std::vector<State*> *`做key,然后重载他的比较类解决.~~那么现在只有容器带来的额外内存占用,这其实是完全可以忽略的,还避免了BST退化成链表的问题.
+
 
 原文在第一遍搜索的时候构建状态,处理的非常巧妙!但我也确实是没怎么理解清楚.
