@@ -10,7 +10,7 @@ namespace RE
 {
 
 // #define catenate ('.') // assume dot('.') as an explicit concatenation operator.
-#define catenate ((char)(20))
+constexpr char catenate = ((char)(20));
 class nfaRE
 {
   protected:
@@ -227,7 +227,6 @@ class nfaRE
         return now.find(&Accept) != now.end();
     }
 };
-#undef catenate
 
 std::unordered_set<nfaRE::State*> nfaRE::now{};
 std::unordered_set<nfaRE::State*> nfaRE::next{};
