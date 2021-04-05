@@ -38,7 +38,9 @@ ab.c    numAtom = 2
 ### 2.从后缀表达式生成nfa状态
 原文中的`Ptrlist`共用体对我来说实在是有点绕,如果我没理解错的话,作者使用union实现type punning,使得Ptrlist即可指向`State`,也可指向`State*`
 如此处理`|`和`?`只需要引入一个节点,而不是两个
-![enter image description here](https://pic1.zhimg.com/v2-8270a394daf5b58cc218c256c00adee5_r.jpg)
+
+![v2-8270a394daf5b58cc218c256c00adee5_r](/assets/v2-8270a394daf5b58cc218c256c00adee5_r.png)
+
 上方的图,箭头类型为`State*`或者`State**`
 下方的图,箭头类型为`State*`
 
