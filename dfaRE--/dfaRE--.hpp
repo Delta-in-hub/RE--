@@ -13,7 +13,7 @@ class dfaRE : protected RE::nfaRE
   protected:
     struct DState
     {
-        std::unordered_map<char, DState*> m;
+        std::unordered_map<int, DState*> m;
         std::vector<State*> n;
         bool searched;
     } * DStart;
@@ -47,7 +47,7 @@ class dfaRE : protected RE::nfaRE
             useNfa = true;
             return;
         }
-        static bool vis[256];
+        static bool vis[512];
         memset(vis, 0, sizeof(vis));
         for (auto&& i : dsta->n)
         {
@@ -57,9 +57,11 @@ class dfaRE : protected RE::nfaRE
             std::vector<State*> arr;
             for (auto&& j : dsta->n)
             {
-                if (j->c == i->c)
+                if (j->c == i->c or j->c == Any)
                     addState2(j->out, arr), addState2(j->out1, arr);
             }
+            if (arr.empty())
+                continue;
             std::sort(begin(arr), end(arr));
             auto pos = allDState.find(&arr);
             if (pos == allDState.end())
@@ -111,9 +113,10 @@ class dfaRE : protected RE::nfaRE
         DState* now = DStart;
         for (auto&& i : str)
         {
-            auto pos = now->m.find(i);
-            if (pos != now->m.end())
-                now = pos->second;
+            if (now->m.find(i) != now->m.end())
+                now = now->m[i];
+            else if (now->m.find(Any) != now->m.end())
+                now = now->m[Any];
             else
                 return false;
         }

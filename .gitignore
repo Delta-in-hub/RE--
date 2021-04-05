@@ -1,3 +1,5 @@
 *.exe
 .vscode/*
 test.cc
+vrex/*
+re1/*

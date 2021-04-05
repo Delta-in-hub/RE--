@@ -1,5 +1,5 @@
-#ifndef NFARE
-#define NFARE
+#ifndef RE__
+#define RE__
 #include <stack>
 #include <stdexcept>
 #include <string>
@@ -8,10 +8,9 @@
 
 namespace RE
 {
-
 // #define catenate ('.') // assume dot('.') as an explicit concatenation operator.
 constexpr char catenate = ((char)(20));
-class nfaRE
+class RE
 {
   protected:
     enum
@@ -19,13 +18,14 @@ class nfaRE
         Split = 256,
         Merge = 257,
         Match = 258,
-        Any
+        Any,
     };
     struct State
     {
         int c;
         State* out;
         State* out1;
+        bool escape;
     } Accept{Match, nullptr, nullptr}, *Start;
     static std::unordered_set<State*> now, next;
     struct Frag
@@ -198,11 +198,11 @@ class nfaRE
     }
 
   public:
-    nfaRE(const std::string& rex)
+    RE(const std::string& rex)
     {
         Start = postToNfa(rexToPostRex(rex));
     }
-    ~nfaRE()
+    ~RE()
     {
         next.clear();
         _delete(Start);
@@ -232,9 +232,8 @@ class nfaRE
     }
 };
 
-std::unordered_set<nfaRE::State*> nfaRE::now{};
-std::unordered_set<nfaRE::State*> nfaRE::next{};
-
+std::unordered_set<RE::State*> RE::now{};
+std::unordered_set<RE::State*> RE::next{};
 } // namespace RE
 
 #endif

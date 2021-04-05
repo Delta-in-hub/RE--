@@ -40,5 +40,11 @@ signed main(void)
     _end = clock();
     cout << cnt2 << '/' << cnt1 << endl;
     debug(_end - _start);
+
+    RE::nfaRE re2("ab.?d");
+    assert(re2.match("abcd"));
+    assert(re2.match("abd"));
+    assert(re2.match("abf"));
+    assert(re2.match("abccd"));
     return 0;
 }

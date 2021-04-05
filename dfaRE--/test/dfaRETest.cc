@@ -9,6 +9,7 @@ using namespace std;
 
 signed main(void)
 {
+
     vector<string> test{
         "bbbbccccdddddfh",
         "abbbefh",
@@ -25,7 +26,6 @@ signed main(void)
         "bcddhf",
         "abcddddd",
     };
-    time_t _start = clock(), _end;
     RE::dfaRE re("a?b+c*((d+|e?))fh");
     int cnt1 = 0, cnt2 = 0;
     for (auto&& i : test)
@@ -37,8 +37,42 @@ signed main(void)
             cnt2++;
         }
     }
-    _end = clock();
     cout << cnt2 << '/' << cnt1 << endl;
-    debug(_end - _start);
+
+    RE::dfaRE re2("ab.?e|.cf");
+
+    vector<string> test2 = {
+        "abce",
+        "abe",
+        "be",
+        "bce",
+        "dcf",
+        "cf",
+        "df",
+    };
+    for (auto&& i : test2)
+    {
+        if (not re2.match(i))
+            debug(i);
+    }
+
+    RE::dfaRE re3(".*d");
+    vector<string> test3 = {
+        "asdl;kfjdsa;klf",
+        "l;kj;lkj;lkjd",
+        "d",
+        ";lkklj;j;lkd",
+        "ajklkjd;jlkd",
+        "dddddda",
+        "ddsddfddd",
+        "dlkjadda",
+
+    };
+    for (auto&& i : test3)
+    {
+        if (not re3.match(i))
+            debug(i);
+    }
+
     return 0;
 }
