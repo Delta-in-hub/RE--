@@ -9,7 +9,6 @@ using namespace std;
 
 signed main(void)
 {
-
     vector<string> test{
         "bbbbccccdddddfh",
         "abbbefh",
@@ -73,6 +72,8 @@ signed main(void)
         if (not re3.match(i))
             debug(i);
     }
+    cout << "-----------" << endl;
+    assert(RE::dfaRE("a|a|a").match("aa"));
 
     return 0;
 }

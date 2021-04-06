@@ -10,16 +10,17 @@ namespace RE
 {
 
 // #define catenate ('.') // assume dot('.') as an explicit concatenation operator.
-constexpr char catenate = ((char)(20));
+// constexpr char Catenate = ((char)(20));
 class nfaRE
 {
   protected:
     enum
     {
-        Split = 256,
-        Merge = 257,
-        Match = 258,
-        Any
+        Catenate = 17, // 17 - 20
+        Split    = 256,
+        Merge    = 257,
+        Match    = 258,
+        Any      = 259,
     };
     struct State
     {
@@ -54,7 +55,7 @@ class nfaRE
         {
             switch (i)
             {
-            case catenate:
+            case Catenate:
                 e2 = st.top();
                 st.pop();
                 e1 = st.top();
@@ -127,7 +128,7 @@ class nfaRE
                 if (numAtom == 2)
                 {
                     numAtom--;
-                    pb(catenate);
+                    pb(Catenate);
                 }
                 paren.push({numAtom, numAlt});
                 numAtom = numAlt = 0;
@@ -136,7 +137,7 @@ class nfaRE
                 if (numAtom == 0 or paren.empty())
                     invaild();
                 if (numAtom == 2)
-                    pb(catenate);
+                    pb(Catenate);
                 numAtom = 0;
                 while (numAlt-- > 0)
                     pb('|');
@@ -148,7 +149,7 @@ class nfaRE
                 if (numAtom == 0)
                     invaild();
                 if (numAtom == 2)
-                    pb(catenate);
+                    pb(Catenate);
                 numAtom = 0;
                 numAlt++;
                 break;
@@ -163,7 +164,7 @@ class nfaRE
                 if (numAtom == 2)
                 {
                     numAtom--;
-                    pb(catenate);
+                    pb(Catenate);
                 }
                 pb(i);
                 numAtom++;
@@ -173,7 +174,7 @@ class nfaRE
         if (numAtom == 0 or not paren.empty())
             invaild();
         if (numAtom == 2)
-            pb(catenate);
+            pb(Catenate);
         while (numAlt-- > 0)
             pb('|');
         return res;
