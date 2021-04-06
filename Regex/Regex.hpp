@@ -26,7 +26,7 @@ class Regex : protected RE::dfaRE
     std::string parse(const std::string& source);
 
   public:
-    Regex(const std::string& str, size_t maxdstate = 32)
+    Regex(const std::string& str, const size_t maxdstate = 32)
         : RE::dfaRE(parse(str), maxdstate)
     {
         ;
@@ -52,7 +52,7 @@ std::string Regex::parse(const std::string& source)
         char now = source[i];
         std::string tmp;
         char from;
-        int cnt = 0;
+        bool hasEscape = false;
         switch (now)
         {
         case '[':
@@ -64,11 +64,17 @@ std::string Regex::parse(const std::string& source)
                 else if (now == '-')
                 {
                     if (tmp.empty())
-                        throw std::invalid_argument(source + " at [" + std::to_string(i) + "]");
+                        // throw std::invalid_argument(source + " at [" + std::to_string(i) + "]");
+                        tmp.push_back('-');
                     else
                     {
                         from = tmp.back();
                         now  = next(i);
+                        if (now == ']')
+                        {
+                            tmp.push_back('-');
+                            break;
+                        }
                         while (from < now)
                         {
                             tmp.push_back(++from);
@@ -81,8 +87,7 @@ std::string Regex::parse(const std::string& source)
                     switch (now)
                     {
                     case '\\':
-                        // tmp.push_back(now);
-                        cnt++;
+                        hasEscape = true;
                         break;
                     case 'w':
                         tmp.append("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_");
@@ -118,11 +123,11 @@ std::string Regex::parse(const std::string& source)
                         tmp.push_back(24);
                         break;
                     case '[':
-                        cnt++;
+                        hasEscape = true;
                         tmp.push_back('[');
                         break;
                     case ']':
-                        cnt++;
+                        hasEscape = true;
                         tmp.push_back(']');
                         break;
                     default:
@@ -135,6 +140,8 @@ std::string Regex::parse(const std::string& source)
             } while (true);
             if (not tmp.empty())
             {
+                std::sort(tmp.begin(), tmp.end());
+                tmp.erase(std::unique(tmp.begin(), tmp.end()), tmp.end());
                 res.push_back('(');
                 for (auto&& i : tmp)
                 {
@@ -142,8 +149,8 @@ std::string Regex::parse(const std::string& source)
                     if (i != '\\')
                         res.push_back('|');
                 }
-                if (cnt)
-                    res.append("\\)"), cnt = 0;
+                if (hasEscape)
+                    res.append("\\)"), hasEscape = false;
                 else
                     res.back() = ')';
                 tmp.clear();
@@ -204,6 +211,7 @@ std::string Regex::parse(const std::string& source)
             break;
         }
     }
+    cout << res << endl;
     return res;
 }
 

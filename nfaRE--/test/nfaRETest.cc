@@ -52,9 +52,11 @@ signed main(void)
         assert(re2.match("abf"));
         assert(re2.match("abccd"));
     }
-    string s("\\.\\*\\|[a-c]");
-    RE::nfaRE re4(parse(s));
-    assert(re4.match(".*|b"));
+    string s("[a-b-c]");
+    cout << parse(s) << endl;
+
+    // RE::nfaRE re4(parse(s));
+    // assert(re4.match(" "));
     return 0;
 }
 
@@ -73,7 +75,8 @@ std::string parse(const std::string& source)
         char now = source[i];
         std::string tmp;
         char from;
-        int cnt = 0;
+        int cnt     = 0;
+        int lastpos = 0;
         switch (now)
         {
         case '[':
@@ -84,6 +87,8 @@ std::string parse(const std::string& source)
                     break;
                 else if (now == '-')
                 {
+                    if (lastpos + 1 == i)
+                        tmp.push_back('-');
                     if (tmp.empty())
                         throw std::invalid_argument(source + " at [" + std::to_string(i) + "]");
                     else
@@ -164,7 +169,7 @@ std::string parse(const std::string& source)
                         res.push_back('|');
                 }
                 if (cnt)
-                    res.append("\\)"), cnt = 0;
+                    res.append("\\)"), cnt = false;
                 else
                     res.back() = ')';
                 tmp.clear();
