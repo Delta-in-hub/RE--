@@ -4,8 +4,10 @@
 #include <stdexcept>
 #include <string>
 #include <tuple>
+#include <unordered_map>
 #include <unordered_set>
 
+#include <iostream>
 namespace RE
 {
 
@@ -16,7 +18,7 @@ class nfaRE
   protected:
     enum
     {
-        Catenate = 17, // 17 - 20
+        Catenate = 17, //! 17 , 18-24  are reserved.
         Split    = 256,
         Merge    = 257,
         Match    = 258,
@@ -28,7 +30,9 @@ class nfaRE
         State* out;
         State* out1;
     } Accept{Match, nullptr, nullptr}, *Start;
+
     static std::unordered_set<State*> now, next;
+    static const std::unordered_map<char, char> ESCAPE;
     struct Frag
     {
         State* head;
@@ -96,11 +100,22 @@ class nfaRE
                 cat(e1.tail, s);
                 st.push({s, s});
                 break;
+            case '.':
+                s = state(Any, nullptr, nullptr);
+                st.push({s, s});
+                break;
+            case 18: // *
+            case 19: //.
+            case 20: //+
+            case 21:
+            case 22:
+            case 23:
+            case 24:
+                s = state(ESCAPE.at(i), nullptr, nullptr);
+                st.push({s, s});
+                break;
             default:
-                if (i == '.')
-                    s = state(Any, nullptr, nullptr);
-                else
-                    s = state(i, nullptr, nullptr);
+                s = state(i, nullptr, nullptr);
                 st.push({s, s});
                 break;
             }
@@ -120,8 +135,9 @@ class nfaRE
         auto invaild = [&rex]() { throw std::invalid_argument("Invalid Regex:" + rex); };
         stack<pair<int, int>> paren;
         int numAtom = 0 /* 当前正则块的个数 [0-2]*/, numAlt = 0; /* | 的个数*/
-        for (auto&& i : rex)
+        for (size_t j = 0; j < rex.length(); j++)
         {
+            char i = rex[j];
             switch (i)
             {
             case '(':
@@ -235,6 +251,15 @@ class nfaRE
 
 std::unordered_set<nfaRE::State*> nfaRE::now{};
 std::unordered_set<nfaRE::State*> nfaRE::next{};
+const std::unordered_map<char, char> nfaRE::ESCAPE{
+    {18, '*'},
+    {19, '.'},
+    {20, '+'},
+    {21, '?'},
+    {22, '|'},
+    {23, '('},
+    {24, ')'},
+};
 
 } // namespace RE
 

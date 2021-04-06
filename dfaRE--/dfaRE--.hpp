@@ -7,10 +7,10 @@
 #include <vector>
 namespace RE
 {
-constexpr size_t MAXDSTATELIMIT = 32;
 class dfaRE : protected RE::nfaRE
 {
   protected:
+    size_t MAXDSTATELIMIT;
     struct DState
     {
         std::unordered_map<int, DState*> m;
@@ -85,9 +85,11 @@ class dfaRE : protected RE::nfaRE
     }
 
   public:
-    dfaRE(const std::string& rex)
-        : nfaRE(rex), useNfa(false)
+    dfaRE(const std::string& rex, size_t maxdstate = 32)
+        : nfaRE(rex)
     {
+        useNfa         = false;
+        MAXDSTATELIMIT = maxdstate;
         std::vector<State*> arr;
         addState2(Start, arr);
         std::sort(begin(arr), end(arr));
