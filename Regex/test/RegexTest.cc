@@ -1,6 +1,7 @@
 #include "../Regex.hpp"
 #include <algorithm>
 #include <cassert>
+#include <chrono>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
@@ -31,15 +32,15 @@ using namespace std;
     * a{3} (aaa)
     * a{3,5} (aaa|aaaa|aaaaa)
     */
+using namespace std::chrono;
 int main(void)
 {
-    clock_t s1 = clock(), s2, s3;
-    RE::Regex re("([a-z-0-9_\\.-]+)@([\\da-z\\.-]+)\\.[a-z]*", 64);
-    s2 = clock();
-    assert(re.match("delta-in-hub@github.com"));
-    s3 = clock();
-    cout << s3 - s1 << endl;
-    cout << s2 - s1 << endl;
-
+    high_resolution_clock::time_point t1 = high_resolution_clock::now();
+    RE::Regex re("\\n([a-z-0-9_\\.-]+)@([\\da-z-]+)\\.[a-z]*\\t", 64);
+    assert(re.match("\ndelta-in-hub@github123123123.com\t"));
+    // assert(re.match("\ndelta-in-hub@11223\t\n3github.com\t"));
+    high_resolution_clock::time_point t2   = high_resolution_clock::now();
+    duration<double, std::milli> time_span = t2 - t1;
+    cout << time_span.count() << "ms" << endl;
     return 0;
 }

@@ -211,7 +211,7 @@ std::string Regex::parse(const std::string& source)
             break;
         }
     }
-    cout << res << endl;
+    // cout << res << endl;
     return res;
 }
 
