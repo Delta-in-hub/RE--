@@ -117,7 +117,7 @@ class dfaRE : protected RE::nfaRE
         {
             if (now->m.find(i) != now->m.end())
                 now = now->m[i];
-            else if (now->m.find(Any) != now->m.end())
+            else if (now->m.find(Any) != now->m.end() and i != '\n')
                 now = now->m[Any];
             else
                 return false;

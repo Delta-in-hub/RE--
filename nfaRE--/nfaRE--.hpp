@@ -237,7 +237,7 @@ class nfaRE
         {
             for (auto&& j : now)
             {
-                if (j->c == i or j->c == Any)
+                if (j->c == i or (j->c == Any and i != '\n'))
                 {
                     addState(j->out, next);
                 }
