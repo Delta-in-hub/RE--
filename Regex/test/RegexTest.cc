@@ -25,14 +25,14 @@ int main(void)
     clock_t t1, t2;
     double ans1 = 0;
     t1          = clock();
-    RE::Regex re("\\{} \\[] [a-c]"); //bug
+    RE::Regex re("((..)|(.))((..)|(.))"); //bug
     // RE::Regex re("([a][dhz]?)+"); //Ok
     t2 = clock();
     cout << t2 - t1 << endl;
     for (int i = 0; i < Round; i++)
     {
         t1 = clock();
-        assert(re.match("{} [] b"));
+        assert(re.match("a"));
         t2 = clock();
         ans1 += t2 - t1;
     }
