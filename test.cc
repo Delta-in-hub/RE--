@@ -1,14 +1,18 @@
 #include "Regex/Regex.hpp"
 #include <fstream>
 #include <iostream>
+#include <stdexcept>
 using namespace std;
 
 void rexTest(const string& s)
 {
     cout << s << endl;
     ifstream fs(s);
+    if (not fs.good())
+        throw invalid_argument("not fs.good()");
     string a, b, c, d;
     char tmp[1000];
+    int cnt = 0;
     while (fs >> a >> b >> c >> d)
     {
         if (c == "NULL")
@@ -37,17 +41,18 @@ void rexTest(const string& s)
             cout << "----" << endl;
         }
         // cout << endl;
+        cnt++;
         delete re;
     }
     fs.close();
-    cout << s << "  Done and No error!" << endl;
+    cout << s <<' '<<cnt<< " cases Done and No error!" << endl;
 }
 
 signed main(void)
 {
     for (int i = 0; i < 6; i++)
     {
-        rexTest("rexTestCase" + to_string(i) + ".txt");
+        rexTest("./rexTestCase/rexTestCase" + to_string(i) + ".txt");
     }
     return 0;
 }
