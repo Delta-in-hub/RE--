@@ -63,6 +63,7 @@ class dfaRE : protected RE::nfaRE
             if (arr.empty())
                 continue;
             std::sort(begin(arr), end(arr));
+            arr.erase(std::unique(begin(arr), end(arr)), end(arr));
             auto pos = allDState.find(&arr);
             if (pos == allDState.end())
             {

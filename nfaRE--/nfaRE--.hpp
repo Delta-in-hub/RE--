@@ -193,6 +193,7 @@ class nfaRE
             pb(Catenate);
         while (numAlt-- > 0)
             pb('|');
+        cout << res << endl;
         return res;
     }
     void _delete(State* now)

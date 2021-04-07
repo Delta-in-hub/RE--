@@ -25,14 +25,14 @@ int main(void)
     clock_t t1, t2;
     double ans1 = 0;
     t1          = clock();
-    // RE::Regex re("([d][dhz]?)+");  //bug
-    RE::Regex re("([a][dhz]?)+"); //Ok
+    RE::Regex re("M[ou]'?am+[ae]r_.*([AEae]l[-_])?[GKQ]h?[aeu]+([dtz][dhz]?)+af[iy]"); //bug
+    // RE::Regex re("([a][dhz]?)+"); //Ok
     t2 = clock();
     cout << t2 - t1 << endl;
     for (int i = 0; i < Round; i++)
     {
         t1 = clock();
-        assert(re.match("ij"));
+        assert(re.match("Mo'ammar_Gadhafi"));
         t2 = clock();
         ans1 += t2 - t1;
     }
