@@ -30,22 +30,16 @@ class dfaRE : protected RE::nfaRE
 
     std::map<std::vector<State*>*, DState*, mcmp> allDState;
 
-    void addState2(State* s, std::vector<State*>& stateSet, State* pre)
+    void addState2(State* s, std::vector<State*>& stateSet)
     {
         if (s == nullptr or ((s->c == Split or s->c == Merge) and s->searched))
             return;
         if (s->c == Split or s->c == Merge)
             s->searched = true;
-        if (s->c == Split or s->c == Merge) //a*+ bug
+        if (s->c == Split or s->c == Merge)
         {
-            if ((pre and (pre->c == Split or pre->c == Split)) and (s->out == pre))
-                ;
-            else
-                addState2(s->out, stateSet, s);
-            if (pre and (pre->c == Split or pre->c == Split) and (s->out1 == pre))
-                ;
-            else
-                addState2(s->out1, stateSet, s);
+            addState2(s->out, stateSet);
+            addState2(s->out1, stateSet);
         }
         else
             stateSet.push_back(s);
@@ -70,7 +64,7 @@ class dfaRE : protected RE::nfaRE
             for (auto&& j : dsta->n)
             {
                 if (j->c == i->c or j->c == Any)
-                    addState2(j->out, arr, j), addState2(j->out1, arr, j);
+                    addState2(j->out, arr), addState2(j->out1, arr);
             }
             if (arr.empty())
                 continue;
@@ -104,7 +98,7 @@ class dfaRE : protected RE::nfaRE
         useNfa         = false;
         MAXDSTATELIMIT = maxdstate;
         std::vector<State*> arr;
-        addState2(Start, arr, nullptr);
+        addState2(Start, arr);
         std::sort(begin(arr), end(arr));
         DStart = new DState({{}, std::move(arr), false});
         allDState.insert({&(DStart->n), DStart});
