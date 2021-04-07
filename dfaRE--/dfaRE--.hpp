@@ -125,8 +125,9 @@ class dfaRE : protected RE::nfaRE
     {
         for (auto&& i : allDState)
             delete i.second;
+        std::map<std::vector<State*>*, DState*, mcmp>().swap(allDState);
         RE::nfaRE::assign(rex);
-        useNfa         = false;
+        useNfa = false;
         std::vector<State*> arr;
         addState2(Start, arr);
         std::sort(begin(arr), end(arr));
@@ -144,7 +145,7 @@ class dfaRE : protected RE::nfaRE
     {
         if (useNfa)
             return nfaRE::match(str);
-        if(not DStart)
+        if (not DStart)
             throw std::logic_error("assign() before match()");
         DState* now = DStart;
         for (auto&& i : str)

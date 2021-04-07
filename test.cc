@@ -4,6 +4,7 @@
 #include <stdexcept>
 using namespace std;
 
+RE::Regex re;
 void rexTest(const string& s)
 {
     cout << s << endl;
@@ -23,16 +24,15 @@ void rexTest(const string& s)
             b.erase(0, 1);
         if (b.back() == '$')
             b.pop_back();
-        RE::Regex* re;
         try
         {
-            re = new RE::Regex(b);
+            re.assign(b);
         }
         catch (const std::exception& e)
         {
             cout << a << endl;
         }
-        if ((r - l == int(c.length()) and not re->match(c)) or (r - l != int(c.length()) and re->match(c)))
+        if ((r - l == int(c.length()) and not re.match(c)) or (r - l != int(c.length()) and re.match(c)))
         {
             cout << a;
             cout << " not match!" << endl;
@@ -42,10 +42,9 @@ void rexTest(const string& s)
         }
         // cout << endl;
         cnt++;
-        delete re;
     }
     fs.close();
-    cout << s <<' '<<cnt<< " cases Done and No error!" << endl;
+    cout << s << ' ' << cnt << " cases Done and No error!" << endl;
 }
 
 signed main(void)
@@ -54,5 +53,6 @@ signed main(void)
     {
         rexTest("./rexTestCase/rexTestCase" + to_string(i) + ".txt");
     }
+    cout << "Over!" << endl;
     return 0;
 }
