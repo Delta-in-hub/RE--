@@ -29,6 +29,7 @@ class nfaRE
         int c;
         State* out;
         State* out1;
+        bool searched = false;
     } Accept{Match, nullptr, nullptr}, *Start;
 
     static std::unordered_set<State*> now, next;
@@ -193,7 +194,8 @@ class nfaRE
             pb(Catenate);
         while (numAlt-- > 0)
             pb('|');
-        cout << res << endl;
+        // cout << res << endl;
+
         return res;
     }
     void _delete(State* now)

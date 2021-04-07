@@ -7,8 +7,6 @@
 #include <tuple>
 #include <unordered_set>
 
-#define debug(x) std::cout << #x << " is " << (x) << '\n'
-
 namespace RE
 {
 class Regex : protected RE::dfaRE
@@ -201,6 +199,8 @@ std::string Regex::parse(const std::string& source)
                 break;
             case '[':
             case ']':
+            case '{':
+            case '}':
                 res.push_back('\\');
                 res.push_back(now);
                 break;
@@ -215,7 +215,6 @@ std::string Regex::parse(const std::string& source)
         }
     }
     // cout << res << endl;
-    debug(res);
     return res;
 }
 // process {1,3} {1,} {3}
@@ -430,12 +429,34 @@ std::string Regex::parse2(const std::string& src)
                 error(i);
             }
         }
+        else if (src[i] == '\\')
+        {
+            if (i + 1 < src.length())
+            {
+                ch = next(i);
+                switch (ch)
+                {
+                case '[':
+                case ']':
+                case '{':
+                case '}':
+                    res.push_back(ch);
+                    break;
+                default:
+                    res.push_back('\\');
+                    res.push_back(ch);
+                    break;
+                }
+            }
+            else
+                res.push_back('\\');
+        }
         else
         {
             res.push_back(src[i]);
         }
     }
-    debug(res);
+    // cout << res << endl;
     return res;
 }
 } // namespace RE
