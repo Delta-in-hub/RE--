@@ -18,20 +18,21 @@
 #include <vector>
 using namespace std;
 
-const int Round = 1000;
+const int Round = 1;
 
 int main(void)
 {
     clock_t t1, t2;
     double ans1 = 0;
     t1          = clock();
-    RE::Regex re("([a-z0-9_\\.-]+)@([\\da-z\\.-]+)\\.([a-z\\.]{2,6})");
+    // RE::Regex re("([d][dhz]?)+");  //bug
+    RE::Regex re("([a][dhz]?)+"); //Ok
     t2 = clock();
     cout << t2 - t1 << endl;
     for (int i = 0; i < Round; i++)
     {
         t1 = clock();
-        assert(re.match("delta-in-hub@github1.23-123123.comcom"));
+        assert(re.match("ij"));
         t2 = clock();
         ans1 += t2 - t1;
     }
