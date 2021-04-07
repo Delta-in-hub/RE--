@@ -1,5 +1,5 @@
-#ifndef RE__
-#define RE__
+#ifndef __RE__
+#define __RE__
 #include "../dfaRE--/dfaRE--.hpp"
 #include <stack>
 #include <stdexcept>
@@ -24,10 +24,11 @@ class Regex : protected RE::dfaRE
     */
   protected:
     std::string parse(const std::string& source);
+    std::string parse2(const std::string& src);
 
   public:
     Regex(const std::string& str, const size_t maxdstate = 32)
-        : RE::dfaRE(parse(str), maxdstate)
+        : RE::dfaRE(parse2(parse(str)), maxdstate)
     {
         ;
     }
@@ -214,7 +215,225 @@ std::string Regex::parse(const std::string& source)
     // cout << res << endl;
     return res;
 }
-
+// process {1,3} {1,} {3}
+std::string Regex::parse2(const std::string& src)
+{
+    using namespace std;
+    auto error = [&src](int i) { throw std::invalid_argument(src + " at [" + std::to_string(i) + "]"); };
+    auto next  = [&src](size_t& i) -> char {
+        if (i + 1 < src.size())
+            return src[++i];
+        else
+            throw std::invalid_argument(src + " at [" + std::to_string(i) + "]");
+    };
+    string res, tmp;
+    int n1 = 0, n2 = 0;
+    char ch;
+    int l = 0, r = 0;
+    int bracNum = 0;
+    for (size_t i = 0; i < src.length(); i++)
+    {
+        if (src[i] == '{')
+        {
+            n1 = n2 = 0;
+            r       = i;
+            ch      = next(i);
+            while (isdigit(ch))
+            {
+                n1 = n1 * 10 + ch - '0';
+                ch = next(i);
+            }
+            if (ch == ',')
+            {
+                ch = next(i);
+                if (ch == '}')
+                { //a{3,}
+                    switch (src.at(r - 1))
+                    {
+                    case ')':
+                        for (l = res.size() - 1; l >= 0; l--)
+                        {
+                            if (res[l] == ')')
+                                bracNum++;
+                            else if (res[l] == '(')
+                                bracNum--;
+                            if (bracNum == 0)
+                                break;
+                        }
+                        tmp = res.substr(l, res.size() - l);
+                        for (int j = 0; j < n1; j++)
+                        {
+                            res.append(tmp);
+                        }
+                        res.push_back('*');
+                        break;
+                    case '*':
+                    case '|':
+                    case '?':
+                    case '{':
+                        error(r - 1);
+                        break;
+                    default:
+                        for (int j = 0; j < n1; j++)
+                        {
+                            res.push_back(src.at(r - 1));
+                        }
+                        res.push_back('*');
+                        break;
+                    }
+                    continue;
+                }
+                while (isdigit(ch))
+                {
+                    n2 = n2 * 10 + ch - '0';
+                    ch = next(i);
+                }
+                if (ch == '}')
+                {
+                    if (n1 >= n2)
+                        error(i);
+                    switch (src.at(r - 1))
+                    {
+                    case ')':
+                        for (l = res.size() - 1; l >= 0; l--)
+                        {
+                            if (res[l] == ')')
+                                bracNum++;
+                            else if (res[l] == '(')
+                                bracNum--;
+                            if (bracNum == 0)
+                                break;
+                        }
+                        if (res.at(l) != '(')
+                            error(l);
+                        tmp = res.substr(l, res.size() - l);
+                        res.erase(l, res.size() - l);
+                        if (n1 == 0)
+                        {
+                            res.push_back('(');
+                            res.append(tmp);
+                            res.push_back('?');
+                            std::string tmp2 = tmp;
+                            for (int j = 1; j < n2; j++)
+                            {
+                                tmp2.append(tmp);
+                                res.push_back('|');
+                                res.append(tmp2);
+                            }
+                            res.push_back(')');
+                        }
+                        else
+                        {
+                            std::string tmp2;
+                            for (int j = 0; j < n1; j++)
+                            {
+                                tmp2.append(tmp);
+                            }
+                            res.push_back('(');
+                            res.append(tmp2);
+                            while (n1++ < n2)
+                            {
+                                res.push_back('|');
+                                tmp2.append(tmp);
+                                res.append(tmp2);
+                            }
+                            res.push_back(')');
+                        }
+                        break;
+                    case '*':
+                    case '|':
+                    case '?':
+                    case '{':
+                        error(r - 1);
+                        break;
+                    default:
+                        res.pop_back();
+                        if (n1 == 0)
+                        {
+                            res.push_back('(');
+                            res.push_back(src.at(r - 1));
+                            res.push_back('?');
+                            std::string tmp2;
+                            tmp2.push_back(src.at(r - 1));
+                            for (int j = 1; j < n2; j++)
+                            {
+                                res.push_back('|');
+                                tmp2.push_back(src.at(r - 1));
+                                res.append(tmp2);
+                            }
+                            res.push_back(')');
+                        }
+                        else
+                        {
+                            std::string tmp2;
+                            for (int j = 0; j < n1; j++)
+                            {
+                                tmp2.push_back(src.at(r - 1));
+                            }
+                            res.push_back('(');
+                            res.append(tmp2);
+                            while (n1++ < n2)
+                            {
+                                res.push_back('|');
+                                tmp2.push_back(src.at(r - 1));
+                                res.append(tmp2);
+                            }
+                            res.push_back(')');
+                        }
+                        break;
+                    }
+                }
+                else
+                    error(i);
+            }
+            else if (ch == '}')
+            { //a{3}
+                switch (src.at(r - 1))
+                {
+                case ')':
+                    for (l = res.size() - 1; l >= 0; l--)
+                    {
+                        if (res[l] == ')')
+                            bracNum++;
+                        else if (res[l] == '(')
+                            bracNum--;
+                        if (bracNum == 0)
+                            break;
+                    }
+                    tmp = res.substr(l, res.size() - l);
+                    res.erase(l, res.size() - l);
+                    for (int j = 0; j < n1; j++)
+                    {
+                        res.append(tmp);
+                    }
+                    break;
+                case '*':
+                case '|':
+                case '?':
+                case '{':
+                    error(r - 1);
+                    break;
+                default:
+                    res.pop_back();
+                    for (int j = 0; j < n1; j++)
+                    {
+                        res.push_back(src.at(r - 1));
+                    }
+                    break;
+                }
+            }
+            else
+            {
+                error(i);
+            }
+        }
+        else
+        {
+            res.push_back(src[i]);
+        }
+    }
+    return res;
+}
 } // namespace RE
 
 #endif

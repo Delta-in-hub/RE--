@@ -21,8 +21,8 @@ using namespace std::chrono;
 int main(void)
 {
     high_resolution_clock::time_point t1 = high_resolution_clock::now();
-    RE::Regex re("\\n([a-z-0-9_\\.-]+)@([\\da-z-]+)\\.[a-z]*\\t", 64);
-    assert(re.match("\ndelta-in-hub@github123123123.com\t"));
+    RE::Regex re("([a-z0-9_\\.-]+)@([\\da-z\\.-]+)\\.([a-z\\.]{2,6})", 64);
+    assert(re.match("delta-in-hub@github1.23-123123.comcom"));
     // assert(re.match("\ndelta-in-hub@11223\t\n3github.com\t"));
     high_resolution_clock::time_point t2   = high_resolution_clock::now();
     duration<double, std::milli> time_span = t2 - t1;
