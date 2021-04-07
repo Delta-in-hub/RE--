@@ -85,7 +85,7 @@ class dfaRE : protected RE::nfaRE
     }
 
   public:
-    dfaRE(const std::string& rex, const size_t maxdstate = 32)
+    dfaRE(const std::string& rex, const size_t maxdstate = 64)
         : nfaRE(rex)
     {
         useNfa         = false;

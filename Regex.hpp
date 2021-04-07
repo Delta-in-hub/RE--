@@ -1,9 +1,9 @@
 /*
 * RE--
+* Head only version
 *
 * @author:delta-in-hub
 * @date:2021/04/06
-* Head only version
 * https://github.com/Delta-in-hub/RE--
 */
 #ifndef REGEX

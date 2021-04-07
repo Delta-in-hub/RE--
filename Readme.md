@@ -14,9 +14,9 @@ A simple Regular expression engine.
     * \w [A-Za-z0-9_]
     * \d  [0-9]
     * \n char(10)
+    * a{3} (aaa)
+    * a{3,5} (aaa|aaaa|aaaaa)
     *
     * TODO
     *
-    * a{3} (aaa)
-    * a{3,5} (aaa|aaaa|aaaaa)
 */

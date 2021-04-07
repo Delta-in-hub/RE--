@@ -27,7 +27,7 @@ class Regex : protected RE::dfaRE
     std::string parse2(const std::string& src);
 
   public:
-    Regex(const std::string& str, const size_t maxdstate = 32)
+    Regex(const std::string& str, const size_t maxdstate = 256)
         : RE::dfaRE(parse2(parse(str)), maxdstate)
     {
         ;
