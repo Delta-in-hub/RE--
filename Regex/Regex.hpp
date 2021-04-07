@@ -27,16 +27,25 @@ class Regex : protected RE::dfaRE
     std::string parse2(const std::string& src);
 
   public:
+    Regex(const size_t maxdstate = 256)
+    {
+        RE::dfaRE::MAXDSTATELIMIT = maxdstate;
+    }
     Regex(const std::string& str, const size_t maxdstate = 256)
         : RE::dfaRE(parse2(parse(str)), maxdstate)
     {
         ;
+    }
+    void assign(const std::string& str)
+    {
+        RE::dfaRE::assign(parse2(parse(str)));
     }
     bool match(const std::string& tar)
     {
         return dfaRE::match(tar);
     }
 };
+
 std::string Regex::parse(const std::string& source)
 {
     using namespace std;

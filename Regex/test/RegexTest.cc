@@ -32,10 +32,17 @@ int main(void)
     for (int i = 0; i < Round; i++)
     {
         t1 = clock();
-        assert(re.match("a"));
+        assert(re.match("aab"));
         t2 = clock();
         ans1 += t2 - t1;
     }
     cout << ans1 << endl;
+    re.assign("[a-c]{3}\\(\\)\\{\\}");
+    assert(re.match("abb(){}"));
+    cout << 111 << endl;
+    RE::Regex re2;
+    re2.assign("[a-e]*");
+    assert(re2.match("abcde"));
+    cout << 222 << endl;
     return 0;
 }

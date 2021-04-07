@@ -218,6 +218,10 @@ class nfaRE
     }
 
   public:
+    nfaRE()
+    {
+        Start = nullptr;
+    }
     nfaRE(const std::string& rex)
     {
         Start = postToNfa(rexToPostRex(rex));
@@ -232,9 +236,22 @@ class nfaRE
         }
         next.clear();
     }
+    void assign(const std::string& rex)
+    {
+        next.clear();
+        _delete(Start);
+        for (auto&& i : next)
+        {
+            delete i;
+        }
+        next.clear();
+        Start = postToNfa(rexToPostRex(rex));
+    }
     bool match(const std::string& target)
     {
         now.clear(), next.clear();
+        if(not Start)
+            throw std::logic_error("assign() before match()");
         addState(Start, now);
         for (auto&& i : target)
         {

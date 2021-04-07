@@ -73,7 +73,7 @@ signed main(void)
             debug(i);
     }
     cout << "-----------" << endl;
-    assert(RE::dfaRE("..").match("a\n"));
-
+    re3.assign("a..cde");
+    assert(re3.match("aoocde"));
     return 0;
 }
