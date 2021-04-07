@@ -209,12 +209,18 @@ class nfaRE
     }
     void addState(State* s, std::unordered_set<State*>& stateSet)
     {
-        if (s == nullptr)
+        if (s == nullptr or ((s->c == Split or s->c == Merge) and s->searched))
             return;
         if (s->c == Split or s->c == Merge)
-            addState(s->out, stateSet), addState(s->out1, stateSet);
+            s->searched = true;
+        if (s->c == Split or s->c == Merge)
+        {
+            addState(s->out, stateSet);
+            addState(s->out1, stateSet);
+        }
         else
             stateSet.insert(s);
+        s->searched = false;
     }
 
   public:

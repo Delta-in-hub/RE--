@@ -1,10 +1,11 @@
-#include "Regex/Regex.hpp"
+// #include "Regex/Regex.hpp"
+#include "Regex.h"
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
 using namespace std;
 
-RE::Regex re;
+RE::Regex re(128);
 void rexTest(const string& s)
 {
     cout << s << endl;
@@ -54,5 +55,6 @@ signed main(void)
         rexTest("./rexTestCase/rexTestCase" + to_string(i) + ".txt");
     }
     cout << "Over!" << endl;
+    getchar();
     return 0;
 }

@@ -92,13 +92,13 @@ class dfaRE : protected RE::nfaRE
     }
 
   public:
-    dfaRE(const size_t maxdstate = 64)
+    dfaRE(const size_t maxdstate = 128)
     {
         useNfa         = false;
         MAXDSTATELIMIT = maxdstate;
         DStart         = nullptr;
     }
-    dfaRE(const std::string& rex, const size_t maxdstate = 64)
+    dfaRE(const std::string& rex, const size_t maxdstate = 128)
         : nfaRE(rex)
     {
         useNfa         = false;
