@@ -22,8 +22,8 @@ A Zero to One Regular expression engine which supports almost all feature except
 | \\?           | Just match `?`                                               |
 | \\+           | Just match `+`                                               |
 | \\*           | Just match `*`                                               |
-| \\(\\) | Just match `()` |
-| \\[\\]    | Just match `[]`                                |
+| `\(\)` | Just match `()` |
+| `\[\]`    | Just match `[]`                                |
 | \\{\\} | Just match `{}`                              |
 
 
