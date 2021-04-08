@@ -244,6 +244,49 @@ bool __BASERE__::nfaRE::match(const std::string& target)
     }
     return now.find(&Accept) != now.end();
 }
+
+std::vector<std::pair<size_t, size_t>> __BASERE__::nfaRE::search(const std::string& target)
+{
+    using namespace std;
+
+    auto newDot   = state(Any, nullptr, nullptr);
+    auto newStart = state(Split, newDot, Start);
+    newDot->out   = newStart;
+
+    vector<pair<size_t, size_t>> respos;
+    using namespace std;
+    now.clear(), next.clear();
+    if (not Start)
+        throw std::logic_error("assign() before match()");
+
+    addState(newStart, now);
+    unordered_set<nfaRE::State*> tmp(now);
+    size_t left = 0, right = 0;
+    for (auto&& i : target)
+    {
+        for (auto&& j : now)
+        {
+            if (j->c == i or (j->c == Any))
+            {
+                addState(j->out, next);
+            }
+        }
+        if (tmp == now)
+            left = right;
+        std::swap(now, next);
+        next.clear();
+        if (now.find(&Accept) != now.end())
+        {
+            respos.push_back({left, right});
+            left = right + 1;
+        }
+        right++;
+    }
+    delete newStart;
+    delete newDot;
+    return respos;
+}
+
 std::unordered_set<__BASERE__::nfaRE::State*> __BASERE__::nfaRE::now{};
 std::unordered_set<__BASERE__::nfaRE::State*> __BASERE__::nfaRE::next{};
 const std::unordered_map<char, char> __BASERE__::nfaRE::ESCAPE{

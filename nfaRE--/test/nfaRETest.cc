@@ -12,7 +12,7 @@ std::string parse(const std::string& source);
 
 signed main(void)
 {
-    if (false)
+    if (true)
     {
         vector<string> test{
             "bbbbccccdddddfh",
@@ -38,7 +38,6 @@ signed main(void)
             cnt1++;
             if (not re.match(i))
             {
-                // debug(i);
                 cnt2++;
             }
         }
@@ -46,9 +45,25 @@ signed main(void)
         cout << cnt2 << '/' << cnt1 << endl;
         debug(_end - _start);
     }
-    RE::nfaRE re2("(a*)+");
-    assert(re2.match("-"));
-
-    cout << 123 << endl;
+    RE::nfaRE re2("(ab|cd)");
+    string tar = ("abcd;lkjab;lkjcd;ljkab");
+    auto res   = re2.search(tar);
+    cout << res.size() << endl;
+    for (auto&& i : res)
+    {
+        cout << tar << endl;
+        for (size_t j = 0; j < tar.length(); j++)
+        {
+            if (j < i.first)
+                cout << ' ';
+            else if (j == i.first)
+                cout << '^';
+            else if (j < i.second)
+                cout << '-';
+            else if (j == i.second)
+                cout << '^';
+        }
+        cout << endl;
+    }
     return 0;
 }

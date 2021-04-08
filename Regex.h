@@ -8,11 +8,11 @@
 */
 #ifndef REGEX
 #define REGEX
+#include <map>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-#include <map>
 
 namespace __BASERE__
 {
@@ -55,6 +55,7 @@ class nfaRE
     ~nfaRE();
     void assign(const std::string& rex);
     bool match(const std::string& target);
+    std::vector<std::pair<size_t, size_t>> search(const std::string& target);
 };
 
 class dfaRE : protected nfaRE
@@ -83,6 +84,7 @@ class dfaRE : protected nfaRE
     ~dfaRE();
     void assign(const std::string& rex);
     bool match(const std::string& str);
+    std::vector<std::pair<size_t, size_t>> search(const std::string& target);
 };
 
 }; // namespace __BASERE__
@@ -102,6 +104,7 @@ class Regex : protected __BASERE__::dfaRE
 
     void assign(const std::string& str);
     bool match(const std::string& tar);
+    std::vector<std::pair<size_t, size_t>> search(const std::string& target);
 };
 } // namespace RE
 

@@ -1,13 +1,13 @@
 #ifndef NFARE
 #define NFARE
+#include <iostream>
 #include <stack>
 #include <stdexcept>
 #include <string>
 #include <tuple>
 #include <unordered_map>
 #include <unordered_set>
-
-#include <iostream>
+#include <vector>
 namespace RE
 {
 
@@ -41,10 +41,11 @@ class nfaRE
     };
     State* state(int c, State* out, State* out1)
     {
-        State* t = new State;
-        t->c     = c;
-        t->out   = out;
-        t->out1  = out1;
+        State* t    = new State;
+        t->c        = c;
+        t->out      = out;
+        t->out1     = out1;
+        t->searched = false;
         return t;
     }
     State* postToNfa(const std::string& rex)
@@ -256,7 +257,7 @@ class nfaRE
     bool match(const std::string& target)
     {
         now.clear(), next.clear();
-        if(not Start)
+        if (not Start)
             throw std::logic_error("assign() before match()");
         addState(Start, now);
         for (auto&& i : target)
@@ -272,6 +273,47 @@ class nfaRE
             next.clear();
         }
         return now.find(&Accept) != now.end();
+    }
+    std::vector<std::pair<size_t, size_t>> search(const std::string& target)
+    {
+        using namespace std;
+
+        auto newDot   = state(Any, nullptr, nullptr);
+        auto newStart = state(Split, newDot, Start);
+        newDot->out   = newStart;
+
+        vector<pair<size_t, size_t>> respos;
+        using namespace std;
+        now.clear(), next.clear();
+        if (not Start)
+            throw std::logic_error("assign() before match()");
+
+        addState(newStart, now);
+        unordered_set<nfaRE::State*> tmp(now);
+        size_t left = 0, right = 0;
+        for (auto&& i : target)
+        {
+            for (auto&& j : now)
+            {
+                if (j->c == i or (j->c == Any))
+                {
+                    addState(j->out, next);
+                }
+            }
+            if (tmp == now)
+                left = right;
+            std::swap(now, next);
+            next.clear();
+            if (now.find(&Accept) != now.end())
+            {
+                respos.push_back({left, right});
+                left = right + 1;
+            }
+            right++;
+        }
+        delete newStart;
+        delete newDot;
+        return respos;
     }
 };
 
