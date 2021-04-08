@@ -144,16 +144,7 @@ int main(void)
 `g++ -O2 example.cc Regex.cc -o example -std=c++11`
 
 Output
-
-```
-3
-abc123123aaa21aa321aa
-   ^-^
-abc123123aaa21aa321aa
-      ^-^
-abc123123aaa21aa321aa
-                ^-^
-```
+![Snipaste_2021-04-09_00_05_38](/assets/Snipaste_2021-04-09_00_05_38.jpg)
 
 ## Test cases
 
@@ -162,54 +153,7 @@ abc123123aaa21aa321aa
 `g++ -O2 test.cc Regex.cc -o test -std=c++11 -Wall `
 
 Output
-
-```
-./rexTestCase/rexTestCase0.txt
-./rexTestCase/rexTestCase0.txt 116/116 cases Done and No error!
-./rexTestCase/rexTestCase1.txt
-./rexTestCase/rexTestCase1.txt 15/15 cases Done and No error!
-./rexTestCase/rexTestCase2.txt
-./rexTestCase/rexTestCase2.txt 29/29 cases Done and No error!
-./rexTestCase/rexTestCase3.txt
-./rexTestCase/rexTestCase3.txt 13/13 cases Done and No error!
-./rexTestCase/rexTestCase4.txt
-./rexTestCase/rexTestCase4.txt 72/72 cases Done and No error!
-./rexTestCase/rexTestCase5.txt
-./rexTestCase/rexTestCase5.txt 57/57 cases Done and No error!
-Over!
-3 ab|cd
-abcdhfcd
-^^
-abcdhfcd
-  ^^
-abcdhfcd
-      ^^
-2 aa*
-abcaaaaaaa
-^
-abcaaaaaaa
-   ^-----^
-2 aaa
-abcaaaaaaa
-   ^-^
-abcaaaaaaa
-      ^-^
-1 .*
-abcaaaaaaa
-^--------^
-1 .*@
-delta-in-hub@github.com
-^-----------^
-4 [\d]{2}
-abc123123aaa21aa1aa
-   ^^
-abc123123aaa21aa1aa
-     ^^
-abc123123aaa21aa1aa
-       ^^
-abc123123aaa21aa1aa
-            ^^
-```
+![Snipaste_2021-04-09_00_07_04](/assets/Snipaste_2021-04-09_00_07_04.jpg)
 
 
 
