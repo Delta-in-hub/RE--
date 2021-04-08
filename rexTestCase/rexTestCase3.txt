@@ -10,4 +10,4 @@
 -10	(a|ab)(bcd|c)(d|.*)	abcd	(0,4)(0,1)(1,4)(4,4)
 -11	(ab|a)(c|bcd)(d|.*)	abcd	(0,4)(0,1)(1,4)(4,4)
 -12	(ab|a)(bcd|c)(d|.*)	abcd	(0,4)(0,1)(1,4)(4,4)
--13 .* http://hackage.haskell.org/package/regex-posix-unittest-1.1/src/data-dir/left-assoc.txt (0,87)
+-13 .{12} http://hackage.haskell.org/package/regex-posix-unittest-1.1/src/data-dir/left-assoc.txt (0,87)

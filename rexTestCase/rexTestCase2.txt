@@ -26,4 +26,4 @@
 26	(ab|a)			ab	(0,2)(0,2)
 27	(a|ab)(b*)		ab	(0,2)(0,2)(2,2)
 28	(ab|a)(b*)		ab	(0,2)(0,2)(2,2)
-29 .* http://hackage.haskell.org/package/regex-posix-unittest-1.1/src/data-dir/forced-assoc.txt (0,89)
+29 .{12} http://hackage.haskell.org/package/regex-posix-unittest-1.1/src/data-dir/forced-assoc.txt (0,89)

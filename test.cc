@@ -1,11 +1,11 @@
-// #include "Regex/Regex.hpp"
-#include "Regex.h"
+#include "Regex/Regex.hpp"
+// #include "Regex.h"
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
 using namespace std;
 
-RE::Regex re(128);
+RE::Regex re;
 void rexTest(const string& s)
 {
     cout << s << endl;
@@ -14,7 +14,7 @@ void rexTest(const string& s)
         throw invalid_argument("not fs.good()");
     string a, b, c, d;
     char tmp[1000];
-    int cnt = 0;
+    int cnt = 0, linenum = 0;
     while (fs >> a >> b >> c >> d)
     {
         if (c == "NULL")
@@ -33,6 +33,7 @@ void rexTest(const string& s)
         {
             cout << a << endl;
         }
+        linenum++;
         if ((r - l == int(c.length()) and not re.match(c)) or (r - l != int(c.length()) and re.match(c)))
         {
             cout << a;
@@ -41,11 +42,11 @@ void rexTest(const string& s)
             cout << b << '\t' << c << '\t' << d << endl;
             cout << "----" << endl;
         }
-        // cout << endl;
-        cnt++;
+        else
+            cnt++;
     }
     fs.close();
-    cout << s << ' ' << cnt << " cases Done and No error!" << endl;
+    cout << s << ' ' << cnt << '/' << linenum << " cases Done and No error!" << endl;
 }
 
 signed main(void)
@@ -55,6 +56,5 @@ signed main(void)
         rexTest("./rexTestCase/rexTestCase" + to_string(i) + ".txt");
     }
     cout << "Over!" << endl;
-    getchar();
     return 0;
 }
