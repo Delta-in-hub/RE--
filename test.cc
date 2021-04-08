@@ -54,7 +54,7 @@ void searchTest(const std::string& rex, const std::string& source)
     RE::Regex re2(rex);
     string tar = (source);
     auto res   = re2.search(tar);
-    cout << res.size() << endl;
+    cout << res.size() << ' ' << rex << endl;
     for (auto&& i : res)
     {
         // cout << i.first << " " << i.second << endl;

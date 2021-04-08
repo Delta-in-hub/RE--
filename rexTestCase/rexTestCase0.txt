@@ -114,4 +114,4 @@
    144        .*(/000).*            /000            (0,4)(0,4)
    145        .*(\\000).*            \000            (0,4)(0,4)
    146        \\000                \000            (0,4)
-   147        .{2,10}      http://hackage.haskell.org/package/regex-posix-unittest-1.1/src/data-dir/basic3.txt    (0,83)
+   147        .{2,100}      http://hackage.haskell.org/package/regex-posix-unittest-1.1/src/data-dir/basic3.txt    (0,83)

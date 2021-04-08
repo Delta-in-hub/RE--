@@ -12,4 +12,4 @@
 11	.*(.*)			ab	(0,2)(2,2)
 12	(a?)((ab)?)(b?)a?(ab)?b?	abab	(0,4)(0,1)(1,1)(?,?)(1,2)(?,?)
 -12	(a?)((ab)?)(b?)a?(ab)?b?	abab	(0,4)(0,1)(1,1)(?,?)(1,2)(2,4)
-13 .{9} http://hackage.haskell.org/package/regex-posix-unittest-1.1/src/data-dir/class.txt (0,82)
+13 .* http://hackage.haskell.org/package/regex-posix-unittest-1.1/src/data-dir/class.txt (0,82)

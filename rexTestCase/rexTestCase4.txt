@@ -76,4 +76,4 @@
 269	(a|ab|c|bcd){4,10}(d*)	ababcd	NOMATCH
 270	(a|ab|c|bcd)*(d*)	ababcd	(0,6)(3,6)(6,6)
 271	(a|ab|c|bcd)+(d*)	ababcd	(0,6)(3,6)(6,6)
-272 .{14} http://hackage.haskell.org/package/regex-posix-unittest-1.1/src/data-dir/repetition2.txt (0,88)
+272 .{1,104} http://hackage.haskell.org/package/regex-posix-unittest-1.1/src/data-dir/repetition2.txt (0,88)
