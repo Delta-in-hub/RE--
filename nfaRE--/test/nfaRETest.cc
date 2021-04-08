@@ -18,7 +18,7 @@ void searchTest(const std::string& rex, const std::string& source)
     cout << res.size() << endl;
     for (auto&& i : res)
     {
-        cout << i.first << " " << i.second << endl;
+        // cout << i.first << " " << i.second << endl;
         cout << tar << endl;
         for (size_t j = 0; j < tar.length(); j++)
         {
@@ -37,39 +37,8 @@ void searchTest(const std::string& rex, const std::string& source)
 
 signed main(void)
 {
-    if (true)
-    {
-        vector<string> test{
-            "bbbbccccdddddfh",
-            "abbbefh",
-            "abcccccccddddddddfh",
-            "abcccccccdddddddddfh",
-            "bcdfh",
-            "bbbbbbccccccccdddddfh",
-            "bccfh",
-            "acccddfh", // not match cases as follows
-            "bbbbedf",
-            "abbbeh",
-            "sadcasd",
-            "acccdddfh",
-            "bcddhf",
-            "abcddddd",
-        };
-        time_t _start = clock(), _end;
-        RE::nfaRE re("a?b+c*((d+|e?))fh");
-        int cnt1 = 0, cnt2 = 0;
-        for (auto&& i : test)
-        {
-            cnt1++;
-            if (not re.match(i))
-            {
-                cnt2++;
-            }
-        }
-        _end = clock();
-        cout << cnt2 << '/' << cnt1 << endl;
-        debug(_end - _start);
-    }
-    searchTest("ab|cd", "abcdabcd");
+    searchTest("ab|cd", "abcdhfcd");
+    searchTest("aa*", "abcaaaaaaa");
+    searchTest("aaa", "abcaaaaaaa");
     return 0;
 }

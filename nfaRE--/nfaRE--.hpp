@@ -293,7 +293,7 @@ class nfaRE
             char i = target[k];
             for (auto&& j : now)
             {
-                if (j->c == i or (j->c == Any))
+                if (j->c == i or (j->c == Any and j->c != '\n'))
                 {
                     addState(j->out, next);
                 }
@@ -307,26 +307,25 @@ class nfaRE
             next.clear();
             if (now.find(&Accept) != now.end())
             {
-                last = {left, right};
-                // if (not matched)
-                // left = right + 1;
+                last    = {left, right};
                 matched = true;
                 if (k + 1 < target.length())
                 {
-                    i = target[k + 1];
+                    i         = target[k + 1];
+                    bool flag = false;
                     for (auto&& j : now)
                     {
-                        if (j->c == i or (j->c == Any))
+                        if (j->c == i or (j->c == Any and j->c != '\n'))
                         {
-                            addState(j->out, next);
+                            flag = true;
+                            break;
                         }
                     }
-                    if (next.empty())
+                    if (not flag)
                     {
                         left = right + 1;
                         now  = origin;
                     }
-                    next.clear();
                 }
             }
             else
@@ -340,9 +339,7 @@ class nfaRE
             right++;
         }
         if (matched)
-        {
             respos.push_back(last);
-        }
         return respos;
     }
 };

@@ -6,6 +6,7 @@
 #include <string>
 #include <tuple>
 #include <unordered_set>
+#include <vector>
 
 namespace RE
 {
@@ -43,6 +44,10 @@ class Regex : protected RE::dfaRE
     bool match(const std::string& tar)
     {
         return dfaRE::match(tar);
+    }
+    std::vector<std::pair<size_t, size_t>> search(const std::string& str)
+    {
+        return dfaRE::search(str);
     }
 };
 

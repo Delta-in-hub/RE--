@@ -20,29 +20,37 @@ using namespace std;
 
 const int Round = 1;
 
+void searchTest(const std::string& rex, const std::string& source)
+{
+    RE::Regex re2(rex);
+    string tar = (source);
+    auto res   = re2.search(tar);
+    cout << res.size() << endl;
+    for (auto&& i : res)
+    {
+        // cout << i.first << " " << i.second << endl;
+        cout << tar << endl;
+        for (size_t j = 0; j < tar.length(); j++)
+        {
+            if (j < i.first)
+                cout << ' ';
+            else if (j == i.first)
+                cout << '^';
+            else if (j < i.second)
+                cout << '-';
+            else if (j == i.second)
+                cout << '^';
+        }
+        cout << endl;
+    }
+}
+
 int main(void)
 {
-    clock_t t1, t2;
-    double ans1 = 0;
-    t1          = clock();
-    RE::Regex re("((..)|(.))((..)|(.))"); //bug
-    // RE::Regex re("([a][dhz]?)+"); //Ok
-    t2 = clock();
-    cout << t2 - t1 << endl;
-    for (int i = 0; i < Round; i++)
-    {
-        t1 = clock();
-        assert(re.match("aab"));
-        t2 = clock();
-        ans1 += t2 - t1;
-    }
-    cout << ans1 << endl;
-    re.assign("[a-c]{3}\\(\\)\\{\\}");
-    assert(re.match("abb(){}"));
-    cout << 111 << endl;
-    RE::Regex re2;
-    re2.assign("[a-e]*");
-    assert(re2.match("abcde"));
-    cout << 222 << endl;
+    searchTest("ab|cd", "abcdhfcd");
+    searchTest("aa*", "abcaaaaaaa");
+    searchTest("aaa", "abcaaaaaaa");
+    searchTest(".*", "abcaaaaaaa");
+    searchTest("[\\d]{2}", "abc123123aaa21aa1aa");
     return 0;
 }
