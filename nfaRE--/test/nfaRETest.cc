@@ -10,6 +10,31 @@ using namespace std;
 
 std::string parse(const std::string& source);
 
+void searchTest(const std::string& rex, const std::string& source)
+{
+    RE::nfaRE re2(rex);
+    string tar = (source);
+    auto res   = re2.search(tar);
+    cout << res.size() << endl;
+    for (auto&& i : res)
+    {
+        cout << i.first << " " << i.second << endl;
+        cout << tar << endl;
+        for (size_t j = 0; j < tar.length(); j++)
+        {
+            if (j < i.first)
+                cout << ' ';
+            else if (j == i.first)
+                cout << '^';
+            else if (j < i.second)
+                cout << '-';
+            else if (j == i.second)
+                cout << '^';
+        }
+        cout << endl;
+    }
+}
+
 signed main(void)
 {
     if (true)
@@ -45,25 +70,6 @@ signed main(void)
         cout << cnt2 << '/' << cnt1 << endl;
         debug(_end - _start);
     }
-    RE::nfaRE re2("(ab|cd)");
-    string tar = ("abcd;lkjab;lkjcd;ljkab");
-    auto res   = re2.search(tar);
-    cout << res.size() << endl;
-    for (auto&& i : res)
-    {
-        cout << tar << endl;
-        for (size_t j = 0; j < tar.length(); j++)
-        {
-            if (j < i.first)
-                cout << ' ';
-            else if (j == i.first)
-                cout << '^';
-            else if (j < i.second)
-                cout << '-';
-            else if (j == i.second)
-                cout << '^';
-        }
-        cout << endl;
-    }
+    searchTest("ab|cd", "abcdabcd");
     return 0;
 }

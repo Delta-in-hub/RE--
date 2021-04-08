@@ -75,5 +75,26 @@ signed main(void)
     cout << "-----------" << endl;
     re3.assign("a..cde");
     assert(re3.match("aoocde"));
+
+    re3.assign("ab|cd");
+    string tar = ("abcd;lkjab;lkjcd;ljkab");
+    auto res   = re3.search(tar);
+    cout << res.size() << endl;
+    for (auto&& i : res)
+    {
+        cout << tar << endl;
+        for (size_t j = 0; j < tar.length(); j++)
+        {
+            if (j < i.first)
+                cout << ' ';
+            else if (j == i.first)
+                cout << '^';
+            else if (j < i.second)
+                cout << '-';
+            else if (j == i.second)
+                cout << '^';
+        }
+        cout << endl;
+    }
     return 0;
 }

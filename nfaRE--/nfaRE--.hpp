@@ -277,22 +277,20 @@ class nfaRE
     std::vector<std::pair<size_t, size_t>> search(const std::string& target)
     {
         using namespace std;
-
-        auto newDot   = state(Any, nullptr, nullptr);
-        auto newStart = state(Split, newDot, Start);
-        newDot->out   = newStart;
-
         vector<pair<size_t, size_t>> respos;
         using namespace std;
         now.clear(), next.clear();
         if (not Start)
             throw std::logic_error("assign() before match()");
 
-        addState(newStart, now);
-        unordered_set<nfaRE::State*> tmp(now);
+        addState(Start, now);
+        unordered_set<nfaRE::State*> origin(now);
         size_t left = 0, right = 0;
-        for (auto&& i : target)
+        std::pair<size_t, size_t> last;
+        bool matched = false;
+        for (size_t k = 0; k < target.length(); k++)
         {
+            char i = target[k];
             for (auto&& j : now)
             {
                 if (j->c == i or (j->c == Any))
@@ -300,19 +298,51 @@ class nfaRE
                     addState(j->out, next);
                 }
             }
-            if (tmp == now)
-                left = right;
+            if (next.empty())
+            {
+                left = right + 1;
+                next = origin;
+            }
             std::swap(now, next);
             next.clear();
             if (now.find(&Accept) != now.end())
             {
-                respos.push_back({left, right});
-                left = right + 1;
+                last = {left, right};
+                // if (not matched)
+                // left = right + 1;
+                matched = true;
+                if (k + 1 < target.length())
+                {
+                    i = target[k + 1];
+                    for (auto&& j : now)
+                    {
+                        if (j->c == i or (j->c == Any))
+                        {
+                            addState(j->out, next);
+                        }
+                    }
+                    if (next.empty())
+                    {
+                        left = right + 1;
+                        now  = origin;
+                    }
+                    next.clear();
+                }
+            }
+            else
+            {
+                if (matched)
+                {
+                    respos.push_back(last);
+                    matched = false;
+                }
             }
             right++;
         }
-        delete newStart;
-        delete newDot;
+        if (matched)
+        {
+            respos.push_back(last);
+        }
         return respos;
     }
 };
