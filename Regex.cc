@@ -194,12 +194,18 @@ void __BASERE__::nfaRE::addState(State* s, std::unordered_set<State*>& stateSet)
 }
 __BASERE__::nfaRE::nfaRE()
 {
-    Start = nullptr;
+    Start      = nullptr;
+    Accept.c   = Match;
+    Accept.out = Accept.out1 = nullptr;
+    Accept.searched          = false;
 }
 
 __BASERE__::nfaRE::nfaRE(const std::string& rex)
 {
-    Start = postToNfa(rexToPostRex(rex));
+    Accept.c   = Match;
+    Accept.out = Accept.out1 = nullptr;
+    Accept.searched          = false;
+    Start      = postToNfa(rexToPostRex(rex));
 }
 __BASERE__::nfaRE::~nfaRE()
 {

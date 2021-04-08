@@ -85,6 +85,7 @@ signed main(void)
     searchTest("aa*", "abcaaaaaaa");
     searchTest("aaa", "abcaaaaaaa");
     searchTest(".*", "abcaaaaaaa");
+    searchTest(".*@", "delta-in-hub@github.com");
     searchTest("[\\d]{2}", "abc123123aaa21aa1aa");
     return 0;
 }

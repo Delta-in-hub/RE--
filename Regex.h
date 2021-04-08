@@ -33,7 +33,7 @@ class nfaRE
         State* out;
         State* out1;
         bool searched = false;
-    } Accept{Match, nullptr, nullptr}, *Start;
+    } Accept, *Start;
     struct Frag
     {
         State* head;
@@ -100,10 +100,10 @@ class Regex : protected __BASERE__::dfaRE
   public:
     Regex(const size_t maxdstate = 256);
 
-    Regex(const std::string& str, const size_t maxdstate = 256);
+    Regex(const std::string& regexp, const size_t maxdstate = 256);
 
-    void assign(const std::string& str);
-    bool match(const std::string& tar);
+    void assign(const std::string& regexp);
+    bool match(const std::string& target);
     std::vector<std::pair<size_t, size_t>> search(const std::string& target);
 };
 } // namespace RE
