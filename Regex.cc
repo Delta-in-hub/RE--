@@ -248,42 +248,69 @@ bool __BASERE__::nfaRE::match(const std::string& target)
 std::vector<std::pair<size_t, size_t>> __BASERE__::nfaRE::search(const std::string& target)
 {
     using namespace std;
-
-    auto newDot   = state(Any, nullptr, nullptr);
-    auto newStart = state(Split, newDot, Start);
-    newDot->out   = newStart;
-
     vector<pair<size_t, size_t>> respos;
     using namespace std;
     now.clear(), next.clear();
     if (not Start)
         throw std::logic_error("assign() before match()");
 
-    addState(newStart, now);
-    unordered_set<nfaRE::State*> tmp(now);
+    addState(Start, now);
+    unordered_set<nfaRE::State*> origin(now);
     size_t left = 0, right = 0;
-    for (auto&& i : target)
+    std::pair<size_t, size_t> last;
+    bool matched = false;
+    for (size_t k = 0; k < target.length(); k++)
     {
+        char i = target[k];
         for (auto&& j : now)
         {
-            if (j->c == i or (j->c == Any))
+            if (j->c == i or (j->c == Any and j->c != '\n'))
             {
                 addState(j->out, next);
             }
         }
-        if (tmp == now)
-            left = right;
+        if (next.empty())
+        {
+            left = right + 1;
+            next = origin;
+        }
         std::swap(now, next);
         next.clear();
         if (now.find(&Accept) != now.end())
         {
-            respos.push_back({left, right});
-            left = right + 1;
+            last    = {left, right};
+            matched = true;
+            if (k + 1 < target.length())
+            {
+                i         = target[k + 1];
+                bool flag = false;
+                for (auto&& j : now)
+                {
+                    if (j->c == i or (j->c == Any and j->c != '\n'))
+                    {
+                        flag = true;
+                        break;
+                    }
+                }
+                if (not flag)
+                {
+                    left = right + 1;
+                    now  = origin;
+                }
+            }
+        }
+        else
+        {
+            if (matched)
+            {
+                respos.push_back(last);
+                matched = false;
+            }
         }
         right++;
     }
-    delete newStart;
-    delete newDot;
+    if (matched)
+        respos.push_back(last);
     return respos;
 }
 
@@ -435,6 +462,65 @@ bool __BASERE__::dfaRE::match(const std::string& str)
     return std::binary_search(begin(now->n), end(now->n), &Accept);
 }
 
+std::vector<std::pair<size_t, size_t>> __BASERE__::dfaRE::search(const std::string& str)
+{
+    if (useNfa)
+        return nfaRE::search(str);
+    if (not DStart)
+        throw std::logic_error("assign() before match()");
+    std::vector<std::pair<size_t, size_t>> respos;
+    DState* now = DStart;
+    size_t left = 0, right = 0;
+    std::pair<size_t, size_t> last;
+    bool matched = false;
+    for (size_t k = 0; k < str.length(); k++)
+    {
+        char i = str[k];
+        if (now->m.find(i) != now->m.end())
+            now = now->m[i];
+        else if (now->m.find(Any) != now->m.end() and i != '\n')
+            now = now->m[Any];
+        else
+            now = nullptr;
+        if (now == nullptr)
+        {
+            now  = DStart;
+            left = right + 1;
+        }
+        if (std::binary_search(begin(now->n), end(now->n), &Accept))
+        {
+            last    = {left, right};
+            matched = true;
+            if (k + 1 < str.length())
+            {
+                i         = str[k + 1];
+                bool flag = false;
+                if (now->m.find(i) != now->m.end())
+                    flag = true;
+                else if (now->m.find(Any) != now->m.end() and i != '\n')
+                    flag = true;
+                if (not flag)
+                {
+                    left = right + 1;
+                    now  = DStart;
+                }
+            }
+        }
+        else
+        {
+            if (matched)
+            {
+                respos.push_back(last);
+                matched = false;
+            }
+        }
+        right++;
+    }
+    if (matched)
+        respos.push_back(last);
+    return respos;
+}
+
 RE::Regex::Regex(const size_t maxdstate)
 {
     dfaRE::MAXDSTATELIMIT = maxdstate;
@@ -453,6 +539,11 @@ void RE::Regex::assign(const std::string& str)
 bool RE::Regex::match(const std::string& tar)
 {
     return dfaRE::match(tar);
+}
+
+std::vector<std::pair<size_t, size_t>> RE::Regex::search(const std::string& str)
+{
+    return dfaRE::search(str);
 }
 
 std::string RE::Regex::parse(const std::string& source)

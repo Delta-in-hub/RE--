@@ -1,5 +1,5 @@
-#include "Regex/Regex.hpp"
-// #include "Regex.h"
+// #include "Regex/Regex.hpp"
+#include "Regex.h"
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
@@ -49,6 +49,31 @@ void rexTest(const string& s)
     cout << s << ' ' << cnt << '/' << linenum << " cases Done and No error!" << endl;
 }
 
+void searchTest(const std::string& rex, const std::string& source)
+{
+    RE::Regex re2(rex);
+    string tar = (source);
+    auto res   = re2.search(tar);
+    cout << res.size() << endl;
+    for (auto&& i : res)
+    {
+        // cout << i.first << " " << i.second << endl;
+        cout << tar << endl;
+        for (size_t j = 0; j < tar.length(); j++)
+        {
+            if (j < i.first)
+                cout << ' ';
+            else if (j == i.first)
+                cout << '^';
+            else if (j < i.second)
+                cout << '-';
+            else if (j == i.second)
+                cout << '^';
+        }
+        cout << endl;
+    }
+}
+
 signed main(void)
 {
     for (int i = 0; i < 6; i++)
@@ -56,5 +81,10 @@ signed main(void)
         rexTest("./rexTestCase/rexTestCase" + to_string(i) + ".txt");
     }
     cout << "Over!" << endl;
+    searchTest("ab|cd", "abcdhfcd");
+    searchTest("aa*", "abcaaaaaaa");
+    searchTest("aaa", "abcaaaaaaa");
+    searchTest(".*", "abcaaaaaaa");
+    searchTest("[\\d]{2}", "abc123123aaa21aa1aa");
     return 0;
 }
