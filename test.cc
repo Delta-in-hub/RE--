@@ -49,11 +49,11 @@ void rexTest(const string& s)
     cout << s << ' ' << cnt << '/' << linenum << " cases Done and No error!" << endl;
 }
 
-void searchTest(const std::string& rex, const std::string& source)
+void searchTest(const std::string& rex, const std::string& source, bool flag = true)
 {
     RE::Regex re2(rex);
     string tar = (source);
-    auto res   = re2.search(tar);
+    auto res   = re2.search(tar, flag);
     cout << res.size() << ' ' << rex << endl;
     for (auto&& i : res)
     {
@@ -82,7 +82,8 @@ signed main(void)
     }
     cout << "Over!" << endl;
     searchTest("ab|cd", "abcdhfcd");
-    searchTest("aa*", "abcaaaaaaa");
+    searchTest("aa*", "abcaaaaaaa", true);
+    searchTest("aa*", "abcaaaaaaa", false);
     searchTest("aaa", "abcaaaaaaa");
     searchTest(".*", "abcaaaaaaa");
     searchTest(".*@", "delta-in-hub@github.com");
