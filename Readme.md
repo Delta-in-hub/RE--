@@ -137,6 +137,38 @@ Output:
 
 ![Snipaste_2021-04-09_00_07_04](/assets/Snipaste_2021-04-09_00_07_04.jpg)
 
+## Simply comparing performance to std::regex
+
+[Code here](./performance.cc)
+
+Intel 8250u
+gcc version 10.2.0 (MinGW-W64 x86_64-posix-seh, built by Brecht Sanders)
+g++ -O2 performance.cc Regex.cc -o performance -std=c++17 -Wall
+
+```
+std::regex use 1011.8us to construct (?:[hH][tT]{2}[pP]://|[hH][tT]{2}[pP][sS]://)(?:(?:[A-Za-z0-9~-]+).)+(?:[-A-Za-z0-9~\\/_%])+
+RE::Regex use 1998.8us to construct ([hH][tT]{2}[pP]://|[hH][tT]{2}[pP][sS]://)(([A-Za-z0-9~-]+).)+([-A-Za-z0-9~\\/_%])+
+std::regex use 0us to match http://www.fapiao.com/dddp-web/pdf/download?request=6e7JGxxxxx4ILd-kExxxxxxxqJ4-CHLmqVnenXC692m74H38sdfdsazxcUmfcOH2fAfY1Vw__%5EDadIfJgiEf
+RE::Regex use 0us to match http://www.fapiao.com/dddp-web/pdf/download?request=6e7JGxxxxx4ILd-kExxxxxxxqJ4-CHLmqVnenXC692m74H38sdfdsazxcUmfcOH2fAfY1Vw__%5EDadIfJgiEf
+
+std::regex use 1003.7us to construct [a-zA-Z0-9._]+@(?:[a-zA-Z0-9]+.)+com
+RE::Regex use 3997.6us to construct [a-zA-Z0-9._]+@([a-zA-Z0-9]+.)+com
+std::regex use 1.701e+06us to match power.overwhelming@aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+RE::Regex use 0us to match power.overwhelming@aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+
+std::regex use 0us to construct (?:[01]+)+b
+RE::Regex use 998.6us to construct ([01]+)+b
+std::regex use 0us to match 10101010110101001100101010101010101010101010101010000b
+RE::Regex use 0us to match 10101010110101001100101010101010101010101010101010000b
+std::regex use 318996us to match 10101010110101001100101
+RE::Regex use 0us to match 10101010110101001100101
+
+std::regex use 0us to construct [a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(?:\.[a-zA-Z0-9_-]+)+
+RE::Regex use 1000.1us to construct [a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+
+std::regex use 0us to match delta-in-hub@github.com
+RE::Regex use 0us to match delta-in-hub@github.com
+```
+
 ## How could I also make one
 ```c++
 class nfaRE{...};
@@ -163,6 +195,7 @@ Read Readme.md in each subfolder to get more details.
 │  Regex.h      (RE-- header file)
 │  test.cc
 |  example.cc
+|  performance.cc
 ├─assets
 │      ...
 ├─dfaRE--
