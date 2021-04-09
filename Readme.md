@@ -141,9 +141,9 @@ Output:
 
 [Code here](./performance.cc)
 
-Intel 8250u
-gcc version 10.2.0 (MinGW-W64 x86_64-posix-seh, built by Brecht Sanders)
-g++ -O2 performance.cc Regex.cc -o performance -std=c++17 -Wall
+`Intel 8250u`
+`gcc version 10.2.0 (MinGW-W64 x86_64-posix-seh, built by Brecht Sanders)`
+`g++ -O2 performance.cc Regex.cc -o performance -std=c++17 -Wall`
 
 ```
 std::regex use 1011.8us to construct (?:[hH][tT]{2}[pP]://|[hH][tT]{2}[pP][sS]://)(?:(?:[A-Za-z0-9~-]+).)+(?:[-A-Za-z0-9~\\/_%])+
