@@ -6,8 +6,8 @@
 * @date:2021/04/07
 * https://github.com/Delta-in-hub/RE--
 */
-#ifndef REGEX
-#define REGEX
+#ifndef __REGEX
+#define __REGEX
 #include <map>
 #include <string>
 #include <unordered_map>
@@ -48,6 +48,8 @@ class nfaRE
     std::string rexToPostRex(const std::string& rex);
     void _delete(State* now);
     void addState(State* s, std::unordered_set<State*>& stateSet);
+    std::vector<std::pair<size_t, size_t>> greadySearch(const std::string& target);
+    std::vector<std::pair<size_t, size_t>> nonGreadySearch(const std::string& target);
 
   public:
     nfaRE();
@@ -55,7 +57,7 @@ class nfaRE
     ~nfaRE();
     void assign(const std::string& rex);
     bool match(const std::string& target);
-    std::vector<std::pair<size_t, size_t>> search(const std::string& target);
+    std::vector<std::pair<size_t, size_t>> search(const std::string& target, bool isGreadySearch = true);
 };
 
 class dfaRE : protected nfaRE
@@ -77,6 +79,8 @@ class dfaRE : protected nfaRE
     std::map<std::vector<State*>*, DState*, mcmp> allDState;
     void addState2(State* s, std::vector<State*>& stateSet);
     void buildDfa(DState* dsta);
+    std::vector<std::pair<size_t, size_t>> greadySearch(const std::string& target);
+    std::vector<std::pair<size_t, size_t>> nonGreadySearch(const std::string& target);
 
   public:
     dfaRE(const size_t maxdstate = 64);
@@ -84,7 +88,7 @@ class dfaRE : protected nfaRE
     ~dfaRE();
     void assign(const std::string& rex);
     bool match(const std::string& str);
-    std::vector<std::pair<size_t, size_t>> search(const std::string& target);
+    std::vector<std::pair<size_t, size_t>> search(const std::string& target, bool isGreadySearch = true);
 };
 
 }; // namespace __BASERE__
@@ -104,7 +108,7 @@ class Regex : protected __BASERE__::dfaRE
 
     void assign(const std::string& regexp);
     bool match(const std::string& target);
-    std::vector<std::pair<size_t, size_t>> search(const std::string& target);
+    std::vector<std::pair<size_t, size_t>> search(const std::string& target, bool isGreadySearch = true);
 };
 } // namespace RE
 

@@ -24,7 +24,7 @@ void searchTest(const std::string& rex, const std::string& source)
 {
     RE::Regex re2(rex);
     string tar = (source);
-    auto res   = re2.search(tar);
+    auto res   = re2.search(tar,false);
     cout << res.size() << endl;
     for (auto&& i : res)
     {

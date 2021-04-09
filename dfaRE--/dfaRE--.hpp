@@ -90,6 +90,96 @@ class dfaRE : protected RE::nfaRE
                 buildDfa(i.second);
         }
     }
+    std::vector<std::pair<size_t, size_t>> nonGreadySearch(const std::string& str)
+    {
+        if (not DStart)
+            throw std::logic_error("assign() before search()");
+        std::vector<std::pair<size_t, size_t>> respos;
+        DState* now = DStart;
+        size_t left = 0, right = 0;
+        for (size_t k = 0; k < str.length(); k++)
+        {
+            char i = str[k];
+            if (now == DStart)
+            {
+                left = right;
+            }
+            if (now->m.find(i) != now->m.end())
+                now = now->m[i];
+            else if (now->m.find(Any) != now->m.end() and i != '\n')
+                now = now->m[Any];
+            else
+                now = nullptr;
+            if (now and std::binary_search(begin(now->n), end(now->n), &Accept))
+            {
+                respos.push_back({left, right});
+                left = right + 1;
+                now  = DStart;
+            }
+            else if (now == nullptr)
+            {
+                now = DStart;
+            }
+            right++;
+        }
+        return respos;
+    }
+    std::vector<std::pair<size_t, size_t>> greadySearch(const std::string& str)
+    {
+        if (not DStart)
+            throw std::logic_error("assign() before search()");
+        std::vector<std::pair<size_t, size_t>> respos;
+        DState* now = DStart;
+        size_t left = 0, right = 0;
+        std::pair<size_t, size_t> last;
+        bool matched = false;
+        for (size_t k = 0; k < str.length(); k++)
+        {
+            char i = str[k];
+            if (now->m.find(i) != now->m.end())
+                now = now->m[i];
+            else if (now->m.find(Any) != now->m.end() and i != '\n')
+                now = now->m[Any];
+            else
+                now = nullptr;
+            if (now == nullptr)
+            {
+                now  = DStart;
+                left = right + 1;
+            }
+            if (std::binary_search(begin(now->n), end(now->n), &Accept))
+            {
+                last    = {left, right};
+                matched = true;
+                if (k + 1 < str.length())
+                {
+                    i         = str[k + 1];
+                    bool flag = false;
+                    if (now->m.find(i) != now->m.end())
+                        flag = true;
+                    else if (now->m.find(Any) != now->m.end() and i != '\n')
+                        flag = true;
+                    if (not flag)
+                    {
+                        left = right + 1;
+                        now  = DStart;
+                    }
+                }
+            }
+            else
+            {
+                if (matched)
+                {
+                    respos.push_back(last);
+                    matched = false;
+                }
+            }
+            right++;
+        }
+        if (matched)
+            respos.push_back(last);
+        return respos;
+    }
 
   public:
     dfaRE(const size_t maxdstate = 128)
@@ -161,63 +251,14 @@ class dfaRE : protected RE::nfaRE
         }
         return std::binary_search(begin(now->n), end(now->n), &Accept);
     }
-    std::vector<std::pair<size_t, size_t>> search(const std::string& str)
+    std::vector<std::pair<size_t, size_t>> search(const std::string& str, bool isGreadySearch = true)
     {
         if (useNfa)
-            return nfaRE::search(str);
-        if (not DStart)
-            throw std::logic_error("assign() before match()");
-        std::vector<std::pair<size_t, size_t>> respos;
-        DState* now = DStart;
-        size_t left = 0, right = 0;
-        std::pair<size_t, size_t> last;
-        bool matched = false;
-        for (size_t k = 0; k < str.length(); k++)
-        {
-            char i = str[k];
-            if (now->m.find(i) != now->m.end())
-                now = now->m[i];
-            else if (now->m.find(Any) != now->m.end() and i != '\n')
-                now = now->m[Any];
-            else
-                now = nullptr;
-            if (now == nullptr)
-            {
-                now  = DStart;
-                left = right + 1;
-            }
-            if (std::binary_search(begin(now->n), end(now->n), &Accept))
-            {
-                last    = {left, right};
-                matched = true;
-                if (k + 1 < str.length())
-                {
-                    i         = str[k + 1];
-                    bool flag = false;
-                    if (now->m.find(i) != now->m.end())
-                        flag = true;
-                    else if (now->m.find(Any) != now->m.end() and i != '\n')
-                        flag = true;
-                    if (not flag)
-                    {
-                        left = right + 1;
-                        now  = DStart;
-                    }
-                }
-            }
-            else
-            {
-                if (matched)
-                {
-                    respos.push_back(last);
-                    matched = false;
-                }
-            }
-            right++;
-        }
-        if (matched)
-            respos.push_back(last);
-        return respos;
+            return nfaRE::search(str, isGreadySearch);
+        else if (isGreadySearch)
+            return greadySearch(str);
+        else
+            return nonGreadySearch(str);
     }
 };
 

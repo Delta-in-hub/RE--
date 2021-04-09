@@ -205,7 +205,7 @@ __BASERE__::nfaRE::nfaRE(const std::string& rex)
     Accept.c   = Match;
     Accept.out = Accept.out1 = nullptr;
     Accept.searched          = false;
-    Start      = postToNfa(rexToPostRex(rex));
+    Start                    = postToNfa(rexToPostRex(rex));
 }
 __BASERE__::nfaRE::~nfaRE()
 {
@@ -251,14 +251,21 @@ bool __BASERE__::nfaRE::match(const std::string& target)
     return now.find(&Accept) != now.end();
 }
 
-std::vector<std::pair<size_t, size_t>> __BASERE__::nfaRE::search(const std::string& target)
+std::vector<std::pair<size_t, size_t>> __BASERE__::nfaRE::search(const std::string& target, bool isGreadySearch)
+{
+    if (isGreadySearch)
+        return greadySearch(target);
+    else
+        return nonGreadySearch(target);
+}
+
+std::vector<std::pair<size_t, size_t>> __BASERE__::nfaRE::greadySearch(const std::string& target)
 {
     using namespace std;
     vector<pair<size_t, size_t>> respos;
-    using namespace std;
     now.clear(), next.clear();
     if (not Start)
-        throw std::logic_error("assign() before match()");
+        throw std::logic_error("assign() before search()");
 
     addState(Start, now);
     unordered_set<nfaRE::State*> origin(now);
@@ -317,6 +324,46 @@ std::vector<std::pair<size_t, size_t>> __BASERE__::nfaRE::search(const std::stri
     }
     if (matched)
         respos.push_back(last);
+    return respos;
+}
+std::vector<std::pair<size_t, size_t>> __BASERE__::nfaRE::nonGreadySearch(const std::string& target)
+{
+    using namespace std;
+    vector<pair<size_t, size_t>> respos;
+    now.clear(), next.clear();
+    if (not Start)
+        throw std::logic_error("assign() before search()");
+
+    addState(Start, now);
+    unordered_set<nfaRE::State*> origin(now);
+    size_t left = 0, right = 0;
+    for (size_t k = 0; k < target.length(); k++)
+    {
+        char i = target[k];
+        for (auto&& j : now)
+        {
+            if (j->c == i or (j->c == Any and j->c != '\n'))
+            {
+                addState(j->out, next);
+            }
+        }
+        if (now == origin)
+        {
+            left = right;
+        }
+        std::swap(now, next);
+        next.clear();
+        if (now.find(&Accept) != now.end())
+        {
+            respos.push_back({left, right});
+            left = right + 1;
+            now  = origin;
+        }
+        else if (now.empty())
+            now = origin;
+        right++;
+    }
+
     return respos;
 }
 
@@ -468,12 +515,44 @@ bool __BASERE__::dfaRE::match(const std::string& str)
     return std::binary_search(begin(now->n), end(now->n), &Accept);
 }
 
-std::vector<std::pair<size_t, size_t>> __BASERE__::dfaRE::search(const std::string& str)
+std::vector<std::pair<size_t, size_t>> __BASERE__::dfaRE::nonGreadySearch(const std::string& str)
 {
-    if (useNfa)
-        return nfaRE::search(str);
     if (not DStart)
-        throw std::logic_error("assign() before match()");
+        throw std::logic_error("assign() before search()");
+    std::vector<std::pair<size_t, size_t>> respos;
+    DState* now = DStart;
+    size_t left = 0, right = 0;
+    for (size_t k = 0; k < str.length(); k++)
+    {
+        char i = str[k];
+        if (now == DStart)
+        {
+            left = right;
+        }
+        if (now->m.find(i) != now->m.end())
+            now = now->m[i];
+        else if (now->m.find(Any) != now->m.end() and i != '\n')
+            now = now->m[Any];
+        else
+            now = nullptr;
+        if (now and std::binary_search(begin(now->n), end(now->n), &Accept))
+        {
+            respos.push_back({left, right});
+            left = right + 1;
+            now  = DStart;
+        }
+        else if (now == nullptr)
+        {
+            now = DStart;
+        }
+        right++;
+    }
+    return respos;
+}
+std::vector<std::pair<size_t, size_t>> __BASERE__::dfaRE::greadySearch(const std::string& str)
+{
+    if (not DStart)
+        throw std::logic_error("assign() before search()");
     std::vector<std::pair<size_t, size_t>> respos;
     DState* now = DStart;
     size_t left = 0, right = 0;
@@ -527,6 +606,16 @@ std::vector<std::pair<size_t, size_t>> __BASERE__::dfaRE::search(const std::stri
     return respos;
 }
 
+std::vector<std::pair<size_t, size_t>> __BASERE__::dfaRE::search(const std::string& str, bool isGreadySearch)
+{
+    if (useNfa)
+        return nfaRE::search(str, isGreadySearch);
+    else if (isGreadySearch)
+        return greadySearch(str);
+    else
+        return nonGreadySearch(str);
+}
+
 RE::Regex::Regex(const size_t maxdstate)
 {
     dfaRE::MAXDSTATELIMIT = maxdstate;
@@ -547,9 +636,9 @@ bool RE::Regex::match(const std::string& tar)
     return dfaRE::match(tar);
 }
 
-std::vector<std::pair<size_t, size_t>> RE::Regex::search(const std::string& str)
+std::vector<std::pair<size_t, size_t>> RE::Regex::search(const std::string& str, bool isGreadySearch)
 {
-    return dfaRE::search(str);
+    return dfaRE::search(str, isGreadySearch);
 }
 
 std::string RE::Regex::parse(const std::string& source)

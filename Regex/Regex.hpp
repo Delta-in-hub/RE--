@@ -45,9 +45,9 @@ class Regex : protected RE::dfaRE
     {
         return dfaRE::match(tar);
     }
-    std::vector<std::pair<size_t, size_t>> search(const std::string& str)
+    std::vector<std::pair<size_t, size_t>> search(const std::string& str,bool isGreadySearch = true)
     {
-        return dfaRE::search(str);
+        return dfaRE::search(str,isGreadySearch);
     }
 };
 
