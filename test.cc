@@ -31,6 +31,7 @@ void rexTest(const string& s)
         }
         catch (const std::exception& e)
         {
+            cout << e.what() << endl;
             cout << a << endl;
         }
         linenum++;

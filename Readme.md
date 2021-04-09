@@ -1,7 +1,9 @@
 # RE--
 A Zero to One Regular expression engine which supports almost all feature except Capturing Groups, Negated Character Classes and something else.
 
-**C++11 is required.** **Only support ascii characters set.**
+**C++11 is required.** **Only support ascii character set.**
+
+`Regex.h` and `Regex.cc` is all things to let RE-- run.
 
 ## RE– Support
 
@@ -41,44 +43,16 @@ A Zero to One Regular expression engine which supports almost all feature except
 | $             | Matches the end of a line or string               |
 | ……            | Other Metacharacter do not be listed in `Support` |
 
-Notice that : `()`A empty bracket is rejected in RE–. `{n,m}` if n equals to m,RE– will also reject it.
+Notice that : `()`A empty brackets is rejected in RE–. `{n,m}` if n equals to m,RE– will also reject it.
 
-## Tree of repo
 
-```
-│  .gitignore
-│  Readme.md
-│  Regex.cc
-│  Regex.h
-│  test.cc
-├─assets
-│      ...
-├─dfaRE--
-│  │  dfaRE--.hpp  (dfaRE's declaration and definition in one .hpp file)
-│  │  Readme.md
-│  └─test
-│          dfaRETest.cc
-├─nfaRE--
-│  │  nfaRE--.hpp   (nfaRE's declaration and definition in one .hpp file)
-│  │  Readme.md
-│  └─test
-│          nfaRETest.cc
-│          rexTest.txt
-│          rexToPostRexTest.cc
-├─Regex
-│  │  Regex.hpp     (Regex's declaration and definition in one .hpp file)
-│  │  Readme.md
-│  └─test
-│          RegexTest.cc
-└─rexTestCase
-        ... some regexp test cases
-```
 
 ## How to use
 
 `  Regex(const size_t maxDfaState = 256);`
 
-Default constructor,you can also set maximun number limits of state in dfa which is 256 by default.
+Default constructor,you can also set maximun number limit of state in dfa which is 256 by default.
+If the number of dfa's state in construction greater than your limit,it will use nfa to work rather than dfa.
 
 `  Regex(const std::string& regexp, const size_t maxDfaState = 256);`
 
@@ -94,11 +68,16 @@ You have to assign regexp to it if you use Default constructor and then you can 
 
 Determines if the regular expression  matches the entire target character sequence.
 
-`  std::vector<std::pair<size_t, size_t>> Regex::search(const std::string& target);`
+`  std::vector<std::pair<size_t, size_t>> Regex::search(const std::string& target,bool isGreadySearch = true);`
 
-Determines if there is a match between the regular expression  and some subsequence in the target string.
+Determines if there is a match between the regular expression  and some subsequence in the target string. **It will return all substr positions [l,r] which matches regexp.**
 
-It will return all substr positions [l,r] which matches regexp.
+By default,It will search greedily to match substr as long as possible.
+Otherwise,It will try to match as few content as possible that meet the regexp.
+See it:
+![Snipaste_2021-04-09_21_55_25](/assets/Snipaste_2021-04-09_21_55_25.jpg)
+
+## Run Example
 
 ```c++
 //example.cc
@@ -142,23 +121,73 @@ int main(void)
     return 0;
 }
 ```
-`g++ -O2 example.cc Regex.cc -o example -std=c++11`
+`g++ -O2 example.cc Regex.cc -o example -std=c++11 -Wall`
 
-Output
+Output:
+
 ![Snipaste_2021-04-09_00_05_38](/assets/Snipaste_2021-04-09_00_05_38.jpg)
 
-## Test cases
+## Run Test Cases
 
->   http://hackage.haskell.org/package/regex-posix-unittest-1.1/src/data-dir
+Regexp Test cases are from [haskell.org/package/regex-posix-unittest-1.1](http://hackage.haskell.org/package/regex-posix-unittest-1.1/src/data-dir)
 
 `g++ -O2 test.cc Regex.cc -o test -std=c++11 -Wall `
 
-Output
+Output:
+
 ![Snipaste_2021-04-09_00_07_04](/assets/Snipaste_2021-04-09_00_07_04.jpg)
 
+## How could I also make one
+```c++
+class nfaRE{...};
+class dfaRE:protected nfaRE{...};
+class Regex:protected dfaRE{...};
+```
+1. First read this article  https://swtch.com/~rsc/regexp/regexp1.html
+2. Write your own nfaRE,only supporting (concatenation, *, +, ?, | ) operator
+3. Write your own dfaRE,only supporting (concatenation, *, +, ?, | ) operator
+4. Do some work to let your engine suppport **.** *(match any character)*
+5. Do some test and fix some bugs
+6. Write your own Regex, parsing complex regexp to simple regexp which only contains (concatenation, *, +, ?, |, **.** ) operator
+7. Do some test and fix some bugs
+8. Done and give me a star.
+
+Read Readme.md in each subfolder to get more details.
+
+## Tree of repo
+
+```
+│  .gitignore
+│  Readme.md
+│  Regex.cc     (RE--)
+│  Regex.h      (RE-- header file)
+│  test.cc
+|  example.cc
+├─assets
+│      ...
+├─dfaRE--
+│  │  dfaRE--.hpp  (dfaRE's declaration and definition in one .hpp file)
+│  │  Readme.md
+│  └─test
+│          dfaRETest.cc
+├─nfaRE--
+│  │  nfaRE--.hpp   (nfaRE's declaration and definition in one .hpp file)
+│  │  Readme.md
+│  └─test
+│          nfaRETest.cc
+│          rexTest.txt
+│          rexToPostRexTest.cc
+├─Regex
+│  │  Regex.hpp     (Regex's declaration and definition in one .hpp file)
+│  │  Readme.md
+│  └─test
+│          RegexTest.cc
+└─rexTestCase
+        ... some regexp test cases
+```
 
 
 ## TODO
 - [x] 完善文档
-- [ ] 非贪婪匹配
+- [x] 非?贪婪匹配
 - [ ] support Negated Character Classes. e.g [\^abc] to match any character except (a and b and c)
