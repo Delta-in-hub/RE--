@@ -5,26 +5,27 @@ A Zero to One Regular expression engine which supports almost all feature except
 
 ## RE– Support
 
-| Metacharacter | Description                                                  |
-| :------------ | ------------------------------------------------------------ |
-| .             | Match any character except newline'\n'                          |
-| ?             | Match a expression zero or one time                          |
-| +             | Match a expression one or more times                         |
-| *             | Match a expression zero or more times                        |
-| \|            | Alternation                                                  |
-| (expression)  | Just Non-Capturing Groups .                                  |
+| Metacharacter | Description                                                                 |
+| :------------ | --------------------------------------------------------------------------- |
+| .             | Match any character except newline'\n'                                      |
+| ?             | Match a expression zero or one time                                         |
+| +             | Match a expression one or more times                                        |
+| *             | Match a expression zero or more times                                       |
+| \|            | Alternation                                                                 |
+| (expression)  | Just Non-Capturing Groups .                                                 |
 | {M,N}         | Denotes the minimum M and the maximum N match count.e.g`x{0,} y{1,} z{0,1}` |
-| []            | A set of possible character matches.e.g `[a-z0-9_]`          |
-| \w            | Same as [A-Za-z0-9\_].Match an alphanumeric character, including "\_" |
-| \d            | Same as [0-9].Match a digit                                |
-| \n            | Match newline'\n'. (char)(10) in ascii                                |
-| \\\\          | Just match `\`                                               |
-| \\?           | Just match `?`                                               |
-| \\+           | Just match `+`                                               |
-| \\*           | Just match `*`                                               |
-| `\(\)` | Just match `()` |
-| `\[\]`    | Just match `[]`                                |
-| \\{\\} | Just match `{}`                              |
+| []            | A set of possible character matches.e.g `[a-z0-9_]`                         |
+| \w            | Same as [A-Za-z0-9\_].Match an alphanumeric character, including "\_"       |
+| \d            | Same as [0-9].Match a digit                                                 |
+| \n            | Match newline'\n'. (char)(10) in ascii                                      |
+| \t            | Match tab'\t'. (char)(9) in ascii                                      |
+| \\\\          | Just match `\`                                                              |
+| \\?           | Just match `?`                                                              |
+| \\+           | Just match `+`                                                              |
+| \\*           | Just match `*`                                                              |
+| `\(\)`        | Just match `()`                                                             |
+| `\[\]`        | Just match `[]`                                                             |
+| \\{\\}        | Just match `{}`                                                             |
 
 
 
@@ -159,4 +160,5 @@ Output
 
 ## TODO
 - [x] 完善文档
+- [ ] 非贪婪匹配
 - [ ] support Negated Character Classes. e.g [\^abc] to match any character except (a and b and c)

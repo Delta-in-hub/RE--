@@ -223,65 +223,13 @@ class nfaRE
             stateSet.insert(s);
         s->searched = false;
     }
-
-  public:
-    nfaRE()
-    {
-        Start = nullptr;
-    }
-    nfaRE(const std::string& rex)
-    {
-        Start = postToNfa(rexToPostRex(rex));
-    }
-    ~nfaRE()
-    {
-        next.clear();
-        _delete(Start);
-        for (auto&& i : next)
-        {
-            delete i;
-        }
-        next.clear();
-    }
-    void assign(const std::string& rex)
-    {
-        next.clear();
-        _delete(Start);
-        for (auto&& i : next)
-        {
-            delete i;
-        }
-        next.clear();
-        Start = postToNfa(rexToPostRex(rex));
-    }
-    bool match(const std::string& target)
-    {
-        now.clear(), next.clear();
-        if (not Start)
-            throw std::logic_error("assign() before match()");
-        addState(Start, now);
-        for (auto&& i : target)
-        {
-            for (auto&& j : now)
-            {
-                if (j->c == i or (j->c == Any and i != '\n'))
-                {
-                    addState(j->out, next);
-                }
-            }
-            std::swap(now, next);
-            next.clear();
-        }
-        return now.find(&Accept) != now.end();
-    }
-    std::vector<std::pair<size_t, size_t>> search(const std::string& target)
+    std::vector<std::pair<size_t, size_t>> greadySearch(const std::string& target)
     {
         using namespace std;
         vector<pair<size_t, size_t>> respos;
-        using namespace std;
         now.clear(), next.clear();
         if (not Start)
-            throw std::logic_error("assign() before match()");
+            throw std::logic_error("assign() before search()");
 
         addState(Start, now);
         unordered_set<nfaRE::State*> origin(now);
@@ -341,6 +289,104 @@ class nfaRE
         if (matched)
             respos.push_back(last);
         return respos;
+    }
+    std::vector<std::pair<size_t, size_t>> nonGreadySearch(const std::string& target)
+    {
+        using namespace std;
+        vector<pair<size_t, size_t>> respos;
+        now.clear(), next.clear();
+        if (not Start)
+            throw std::logic_error("assign() before search()");
+
+        addState(Start, now);
+        unordered_set<nfaRE::State*> origin(now);
+        size_t left = 0, right = 0;
+        for (size_t k = 0; k < target.length(); k++)
+        {
+            char i = target[k];
+            for (auto&& j : now)
+            {
+                if (j->c == i or (j->c == Any and j->c != '\n'))
+                {
+                    addState(j->out, next);
+                }
+            }
+            if (now == origin)
+            {
+                left = right;
+            }
+            std::swap(now, next);
+            next.clear();
+            if (now.find(&Accept) != now.end())
+            {
+                respos.push_back({left, right});
+                left = right + 1;
+                now  = origin;
+            }
+            else if (now.empty())
+                now = origin;
+            right++;
+        }
+
+        return respos;
+    }
+
+  public:
+    nfaRE()
+    {
+        Start = nullptr;
+    }
+    nfaRE(const std::string& rex)
+    {
+        Start = postToNfa(rexToPostRex(rex));
+    }
+    ~nfaRE()
+    {
+        next.clear();
+        _delete(Start);
+        for (auto&& i : next)
+        {
+            delete i;
+        }
+        next.clear();
+    }
+    void assign(const std::string& rex)
+    {
+        next.clear();
+        _delete(Start);
+        for (auto&& i : next)
+        {
+            delete i;
+        }
+        next.clear();
+        Start = postToNfa(rexToPostRex(rex));
+    }
+    bool match(const std::string& target)
+    {
+        now.clear(), next.clear();
+        if (not Start)
+            throw std::logic_error("assign() before match()");
+        addState(Start, now);
+        for (auto&& i : target)
+        {
+            for (auto&& j : now)
+            {
+                if (j->c == i or (j->c == Any and i != '\n'))
+                {
+                    addState(j->out, next);
+                }
+            }
+            std::swap(now, next);
+            next.clear();
+        }
+        return now.find(&Accept) != now.end();
+    }
+    std::vector<std::pair<size_t, size_t>> search(const std::string& target, bool isGreadySearch = true)
+    {
+        if (isGreadySearch)
+            return greadySearch(target);
+        else
+            return nonGreadySearch(target);
     }
 };
 

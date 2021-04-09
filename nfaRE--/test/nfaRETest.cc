@@ -39,6 +39,6 @@ signed main(void)
 {
     searchTest("ab|cd", "abcdhfcd");
     searchTest("aa*", "abcaaaaaaa");
-    searchTest("aaa", "abcaaaaaaa");
+    searchTest("a+", "abcaaaaaaa");
     return 0;
 }
