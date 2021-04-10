@@ -1,6 +1,10 @@
 # Regex
 
 ## 修改dfa/nfa,支持.匹配任何字符
+nfa的状态转移是比较简单的
+而dfa我们是构建的时候要把整个图都建出来,主要是处理环路,搜过要标记.
+match()的时候,优先匹配确定的字符,匹配不上再匹配Any
+
 ## 第一遍parse
 - [xyz] 展开为 (x|y|z)
 - [0-3] 展开为 (0|1|2|3)
@@ -32,8 +36,8 @@ const std::unordered_map<char, char> nfaRE::ESCAPE{
 - (e1){2,3}  ((e1)(e1)|(e1)(e1)(e1))
 
 
-## 然后?
-对之前的dfa/nfa进行修改
-
-
-https://stackoverflow.com/questions/49112990/destruction-of-static-member-in-a-class-with-global-instance
+## fixed bug
+1. dfa考虑正则式`([a]|[a-c]+)+`,状态是否会无限增加.
+2. dfa搜索过程中有环存在.
+3. 不同翻译单元中,静态变量析构顺序带来的问题[见此](https://www.zhihu.com/question/453887094)
+   1. 在析构函数中绝不要使用任何静态变量,一旦实例的对象作为全局变量会出bug.
