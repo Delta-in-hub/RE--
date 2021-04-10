@@ -1,6 +1,7 @@
 // #include "./Regex/Regex.hpp"
 #include "Regex.h"
 #include <cassert>
+#include <chrono>
 #include <iostream>
 #include <regex>
 
@@ -36,11 +37,11 @@ signed main(void)
     cout << endl;
     rex  = "[a-zA-Z0-9._]+@([a-zA-Z0-9]+.)+com";
     rex1 = "[a-zA-Z0-9._]+@(?:[a-zA-Z0-9]+.)+com";
-    tar  = "power.overwhelming@aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+    tar  = "power.overwhelming@aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
     cout << "std::regex use " << execTime([&rex1]() { stdre.assign(rex1); }) << "us to construct " << rex1 << endl;
     cout << "RE::Regex use " << execTime([&rex]() { myre.assign(rex); }) << "us to construct " << rex << endl;
-    cout << "std::regex use " << execTime([&tar]() { f1 = (regex_match(tar, stdre)); }) << "us to match " << tar << endl;
-    cout << "RE::Regex use " << execTime([&tar]() { f2 = (myre.match(tar)); }) << "us to match " << tar << endl;
+    cout << "std::regex use " << execTime([&tar]() { f1 = (regex_match(tar, stdre)); }) << "us to match\t" << tar << endl;
+    cout << "RE::Regex use " << execTime([&tar]() { f2 = (myre.match(tar)); }) << "us to match\t" << tar << endl;
     assert(f1 == f2);
     f1 = not f2;
     cout << endl;
