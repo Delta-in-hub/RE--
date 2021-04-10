@@ -169,13 +169,13 @@ std::string __BASERE__::nfaRE::rexToPostRex(const std::string& rex)
     return res;
 }
 
-void __BASERE__::nfaRE::_delete(State* now)
+void __BASERE__::nfaRE::_delete(State* now, std::unordered_set<State*>& dustbin)
 {
     if (now == nullptr or now == &Accept or next.find(now) != next.end())
         return;
-    next.insert(now);
-    _delete(now->out);
-    _delete(now->out1);
+    dustbin.insert(now);
+    _delete(now->out, dustbin);
+    _delete(now->out1, dustbin);
 }
 void __BASERE__::nfaRE::addState(State* s, std::unordered_set<State*>& stateSet)
 {
@@ -209,23 +209,18 @@ __BASERE__::nfaRE::nfaRE(const std::string& rex)
 }
 __BASERE__::nfaRE::~nfaRE()
 {
-    next.clear();
-    _delete(Start);
-    for (auto&& i : next)
-    {
+    std::unordered_set<State*> dustbin;
+    _delete(Start, dustbin);
+    for (auto&& i : dustbin)
         delete i;
-    }
-    next.clear();
 }
 
 void __BASERE__::nfaRE::assign(const std::string& rex)
 {
     next.clear();
-    _delete(Start);
+    _delete(Start, next);
     for (auto&& i : next)
-    {
         delete i;
-    }
     next.clear();
     Start = postToNfa(rexToPostRex(rex));
 }

@@ -46,7 +46,7 @@ class nfaRE
     State* state(int c, State* out, State* out1);
     State* postToNfa(const std::string& rex);
     std::string rexToPostRex(const std::string& rex);
-    void _delete(State* now);
+    void _delete(State* now, std::unordered_set<State*>& dustbin);
     void addState(State* s, std::unordered_set<State*>& stateSet);
     std::vector<std::pair<size_t, size_t>> greadySearch(const std::string& target);
     std::vector<std::pair<size_t, size_t>> nonGreadySearch(const std::string& target);

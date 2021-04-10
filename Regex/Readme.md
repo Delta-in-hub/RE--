@@ -34,3 +34,6 @@ const std::unordered_map<char, char> nfaRE::ESCAPE{
 
 ## 然后?
 对之前的dfa/nfa进行修改
+
+
+https://stackoverflow.com/questions/49112990/destruction-of-static-member-in-a-class-with-global-instance
