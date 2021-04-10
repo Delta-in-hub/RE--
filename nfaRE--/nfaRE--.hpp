@@ -30,7 +30,7 @@ class nfaRE
         State* out;
         State* out1;
         bool searched = false;
-    } Accept{Match, nullptr, nullptr}, *Start;
+    } Accept, *Start;
 
     static std::unordered_set<State*> now, next;
     static const std::unordered_map<char, char> ESCAPE;
@@ -199,14 +199,14 @@ class nfaRE
 
         return res;
     }
-    void _delete(State* now)
+    void _delete(State* now, std::unordered_set<nfaRE::State*>& dustbin)
     {
 
-        if (now == nullptr or now == &Accept or next.find(now) != next.end())
+        if (now == nullptr or now == &Accept or dustbin.find(now) != dustbin.end())
             return;
-        next.insert(now);
-        _delete(now->out);
-        _delete(now->out1);
+        dustbin.insert(now);
+        _delete(now->out, dustbin);
+        _delete(now->out1, dustbin);
     }
     void addState(State* s, std::unordered_set<State*>& stateSet)
     {
@@ -334,30 +334,31 @@ class nfaRE
   public:
     nfaRE()
     {
-        Start = nullptr;
+        Start       = nullptr;
+        Accept.c    = Match;
+        Accept.out1 = Accept.out = nullptr;
+        Accept.searched          = false;
     }
     nfaRE(const std::string& rex)
     {
-        Start = postToNfa(rexToPostRex(rex));
+        Accept.out1 = Accept.out = nullptr;
+        Accept.c                 = Match;
+        Accept.searched          = false;
+        Start                    = postToNfa(rexToPostRex(rex));
     }
     ~nfaRE()
     {
-        next.clear();
-        _delete(Start);
-        for (auto&& i : next)
-        {
+        std::unordered_set<nfaRE::State*> dustbin;
+        _delete(Start, dustbin);
+        for (auto&& i : dustbin)
             delete i;
-        }
-        next.clear();
     }
     void assign(const std::string& rex)
     {
         next.clear();
-        _delete(Start);
+        _delete(Start, next);
         for (auto&& i : next)
-        {
             delete i;
-        }
         next.clear();
         Start = postToNfa(rexToPostRex(rex));
     }

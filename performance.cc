@@ -37,7 +37,7 @@ signed main(void)
     cout << endl;
     rex  = "[a-zA-Z0-9._]+@([a-zA-Z0-9]+.)+com";
     rex1 = "[a-zA-Z0-9._]+@(?:[a-zA-Z0-9]+.)+com";
-    tar  = "power.overwhelming@aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+    tar  = "power.overwhelming@aaaaaaaaaaaaaaaaaaaaaaaaaa";
     cout << "std::regex use " << execTime([&rex1]() { stdre.assign(rex1); }) << "us to construct " << rex1 << endl;
     cout << "RE::Regex use " << execTime([&rex]() { myre.assign(rex); }) << "us to construct " << rex << endl;
     cout << "std::regex use " << execTime([&tar]() { f1 = (regex_match(tar, stdre)); }) << "us to match\t" << tar << endl;
