@@ -17,9 +17,10 @@ class dfaRE : protected RE::nfaRE
         std::vector<State*> n;
         bool searched;
     } * DStart;
+    size_t stateNum;
+    std::unordered_set<int> charset;
 
     bool useNfa;
-
     struct mcmp
     {
         bool operator()(const std::vector<State*>* a, const std::vector<State*>* b) const
@@ -60,6 +61,7 @@ class dfaRE : protected RE::nfaRE
             if (vis[i->c])
                 continue;
             vis[i->c] = true;
+            charset.insert(i->c);
             std::vector<State*> arr;
             for (auto&& j : dsta->n)
             {
@@ -74,6 +76,7 @@ class dfaRE : protected RE::nfaRE
             if (pos == allDState.end())
             {
                 DState* ndsta = new DState({{}, std::move(arr), false});
+                stateNum++;
                 allDState.insert({&(ndsta->n), ndsta});
                 dsta->m[i->c] = ndsta;
             }
@@ -89,7 +92,94 @@ class dfaRE : protected RE::nfaRE
             if (not i.second->searched)
                 buildDfa(i.second);
         }
+        dsta->searched = false;
     }
+
+    void minilizeDfa()
+    {
+        using namespace std;
+        stack<vector<DState*>> s;
+        vector<DState*> ac, nac;
+        for (auto&& i : allDState)
+        {
+            if (binary_search(begin(i.second->n), end(i.second->n), &Accept))
+                ac.push_back(i.second);
+            else
+                nac.push_back(i.second);
+        }
+        sort(begin(ac), end(ac));
+        sort(begin(nac), end(nac));
+        s.push(move(ac));
+        s.push(move(nac));
+        vector<vector<DState*>> minidfa;
+        unordered_map<DState*, DState*> _m;
+        while (not s.empty())
+        {
+            auto&& now = s.top();
+            if (now.empty())
+            {
+                s.pop();
+                continue;
+            }
+            vector<DState*> sp, remain;
+            for (auto&& i : now)
+            {
+                bool flag = false;
+                for (auto&& j : charset)
+                {
+                    auto res = i->m.find(j);
+                    if (res != i->m.end() and not binary_search(begin(now), end(now), res->second))
+                    {
+                        sp.push_back(i);
+                        flag = true;
+                        break;
+                    }
+                }
+                if (not flag)
+                    remain.push_back(i);
+            }
+            if (sp.empty())
+            {
+                auto pos = lower_bound(begin(now), end(now), DStart);
+                if (not(pos != now.end() and *pos == DStart))
+                    pos = now.begin();
+                for (size_t i = 0; i < now.size(); i++)
+                {
+                    if (now[i] == *pos)
+                        continue;
+                    else
+                    {
+                        _m.insert({now[i], *pos});
+                        delete now[i];
+                        stateNum--;
+                    }
+                }
+                s.pop();
+            }
+            else
+            {
+                s.pop();
+                s.push(move(remain));
+                s.push(move(sp));
+            }
+        }
+        dfsRebuild(DStart, _m);
+    }
+    void dfsRebuild(DState* now, std::unordered_map<DState*, DState*>& rep)
+    {
+        using namespace std;
+        if (now == nullptr)
+            return;
+        now->searched = true;
+        for (auto&& i : now->m)
+        {
+            i.second = rep[i.second];
+            if (not i.second->searched)
+                dfsRebuild(i.second, rep);
+        }
+        now->searched = false;
+    }
+
     std::vector<std::pair<size_t, size_t>> nonGreadySearch(const std::string& str)
     {
         if (not DStart)
@@ -184,6 +274,7 @@ class dfaRE : protected RE::nfaRE
   public:
     dfaRE(const size_t maxdstate = 128)
     {
+        stateNum       = 0;
         useNfa         = false;
         MAXDSTATELIMIT = maxdstate;
         DStart         = nullptr;
@@ -191,12 +282,14 @@ class dfaRE : protected RE::nfaRE
     dfaRE(const std::string& rex, const size_t maxdstate = 128)
         : nfaRE(rex)
     {
+        stateNum       = 0;
         useNfa         = false;
         MAXDSTATELIMIT = maxdstate;
         std::vector<State*> arr;
         addState2(Start, arr);
         std::sort(begin(arr), end(arr));
         DStart = new DState({{}, std::move(arr), false});
+        stateNum++;
         allDState.insert({&(DStart->n), DStart});
         buildDfa(DStart);
         if (useNfa)
@@ -205,15 +298,21 @@ class dfaRE : protected RE::nfaRE
                 delete i.second;
             std::map<std::vector<State*>*, DState*, mcmp>().swap(allDState);
         }
+        else
+        {
+            minilizeDfa();
+        }
     }
     ~dfaRE()
     {
-        std::cout << allDState.size() << std::endl;
+        std::cout << "dfa:" << stateNum << std::endl;
         for (auto&& i : allDState)
             delete i.second;
     }
     void assign(const std::string& rex)
     {
+        std::cout << "dfa:" << stateNum << std::endl;
+        stateNum = 0;
         for (auto&& i : allDState)
             delete i.second;
         std::map<std::vector<State*>*, DState*, mcmp>().swap(allDState);
@@ -225,6 +324,7 @@ class dfaRE : protected RE::nfaRE
         addState2(Start, arr);
         std::sort(begin(arr), end(arr));
         DStart = new DState({{}, std::move(arr), false});
+        stateNum++;
         allDState.insert({&(DStart->n), DStart});
         buildDfa(DStart);
         if (useNfa)
@@ -232,6 +332,10 @@ class dfaRE : protected RE::nfaRE
             for (auto&& i : allDState)
                 delete i.second;
             std::map<std::vector<State*>*, DState*, mcmp>().swap(allDState);
+        }
+        else
+        {
+            minilizeDfa();
         }
     }
     bool match(const std::string& str)

@@ -223,5 +223,9 @@ Read Readme.md in each subfolder to get more details.
 ## TODO
 - [x] 完善文档
 - [x] 非?贪婪匹配
-- [ ] dfa最小化 
+- [ ] dfa最小化
+- [ ] 位置匹配元字符
 - [ ] support Negated Character Classes. e.g [\^abc] to match any character except (a and b and c)
+- [ ] 解析正则的方法拓展性差,这种方法无法实现捕获
+- [ ] 捕获组
+- [ ] 宽字符
