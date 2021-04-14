@@ -350,6 +350,7 @@ class nfaRE
     {
         std::unordered_set<nfaRE::State*> dustbin;
         _delete(Start, dustbin);
+        std::cout << dustbin.size() << std::endl;
         for (auto&& i : dustbin)
             delete i;
     }

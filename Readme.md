@@ -223,4 +223,5 @@ Read Readme.md in each subfolder to get more details.
 ## TODO
 - [x] 完善文档
 - [x] 非?贪婪匹配
+- [ ] dfa最小化 
 - [ ] support Negated Character Classes. e.g [\^abc] to match any character except (a and b and c)

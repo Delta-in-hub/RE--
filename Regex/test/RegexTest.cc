@@ -24,7 +24,7 @@ void searchTest(const std::string& rex, const std::string& source)
 {
     RE::Regex re2(rex);
     string tar = (source);
-    auto res   = re2.search(tar,false);
+    auto res   = re2.search(tar, false);
     cout << res.size() << endl;
     for (auto&& i : res)
     {
@@ -47,10 +47,11 @@ void searchTest(const std::string& rex, const std::string& source)
 
 int main(void)
 {
-    searchTest("ab|cd", "abcdhfcd");
-    searchTest("aa*", "abcaaaaaaa");
-    searchTest("aaa", "abcaaaaaaa");
-    searchTest(".*", "abcaaaaaaa");
-    searchTest("[\\d]{2}", "abc123123aaa21aa1aa");
+    // searchTest("ab|cd", "abcdhfcd");
+    // searchTest("aa*", "abcaaaaaaa");
+    // searchTest("aaa", "abcaaaaaaa");
+    // searchTest(".*", "abcaaaaaaa");
+    // searchTest("[\\d]{2}", "abc123123aaa21aa1aa");
+    RE::Regex re("(ab)*(a*|b*)(ba)*");
     return 0;
 }

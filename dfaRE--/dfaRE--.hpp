@@ -208,6 +208,7 @@ class dfaRE : protected RE::nfaRE
     }
     ~dfaRE()
     {
+        std::cout << allDState.size() << std::endl;
         for (auto&& i : allDState)
             delete i.second;
     }
