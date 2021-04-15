@@ -34,8 +34,10 @@ void searchTest(const std::string& rex, const std::string& source)
 
 signed main(void)
 {
-    searchTest("ab|cd", "abcdhfcd");
-    searchTest("aa*", "abcaaaaaaa");
-    searchTest("aaa", "abcaaaaaaa");
+    // searchTest("ab|cd", "abcdhfcd");
+    // searchTest("aa*", "abcaaaaaaa");
+    // searchTest("aaa", "abcaaaaaaa");
+    RE::dfaRE re("(ab)*(a*|b*)(ba)*");
+    cout << re.match("abaacaaaaba");
     return 0;
 }

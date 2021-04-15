@@ -61,7 +61,8 @@ class dfaRE : protected RE::nfaRE
             if (vis[i->c])
                 continue;
             vis[i->c] = true;
-            charset.insert(i->c);
+            if (i->c != Match)
+                charset.insert(i->c);
             std::vector<State*> arr;
             for (auto&& j : dsta->n)
             {
@@ -97,70 +98,99 @@ class dfaRE : protected RE::nfaRE
 
     void minilizeDfa()
     {
+        if (false)
+            return;
         using namespace std;
-        stack<vector<DState*>> s;
+        unordered_map<DState*, DState*> _m;
+
+        unordered_map<DState*, int> unionid;
+
+        unordered_map<int, vector<DState*>> group;
+
         vector<DState*> ac, nac;
         for (auto&& i : allDState)
         {
             if (binary_search(begin(i.second->n), end(i.second->n), &Accept))
-                ac.push_back(i.second);
+                ac.push_back(i.second), unionid[i.second] = 0;
             else
-                nac.push_back(i.second);
+                nac.push_back(i.second), unionid[i.second] = 1;
         }
         sort(begin(ac), end(ac));
         sort(begin(nac), end(nac));
-        s.push(move(ac));
-        s.push(move(nac));
-        vector<vector<DState*>> minidfa;
-        unordered_map<DState*, DState*> _m;
-        while (not s.empty())
+        group.insert({0, move(ac)});
+        group.insert({1, move(nac)});
+        int lastUnionId = 1;
+        stack<int> _stack;
+        _stack.push(0);
+        _stack.push(1);
+        while (not _stack.empty())
         {
-            auto&& now = s.top();
-            if (now.empty())
+            auto nowid = _stack.top();
+            _stack.pop();
+            auto pos = group.find(nowid);
+            if (pos == group.end())
+                continue;
+            if (pos->second.size() == 1)
             {
-                s.pop();
+                _m[pos->second.front()] = pos->second.front();
                 continue;
             }
-            vector<DState*> sp, remain;
-            for (auto&& i : now)
+            unordered_map<int, vector<DState*>> spgroup;
+            bool flag = false;
+            for (auto&& ch : charset)
             {
-                bool flag = false;
-                for (auto&& j : charset)
+                for (auto&& st : pos->second)
                 {
-                    auto res = i->m.find(j);
-                    if (res != i->m.end() and not binary_search(begin(now), end(now), res->second))
+                    auto cpos = st->m.find(ch);
+                    if (cpos == st->m.end())
                     {
-                        sp.push_back(i);
-                        flag = true;
-                        break;
+                        spgroup[-1].push_back(st);
                     }
-                }
-                if (not flag)
-                    remain.push_back(i);
-            }
-            if (sp.empty())
-            {
-                auto pos = lower_bound(begin(now), end(now), DStart);
-                if (not(pos != now.end() and *pos == DStart))
-                    pos = now.begin();
-                for (size_t i = 0; i < now.size(); i++)
-                {
-                    if (now[i] == *pos)
-                        continue;
                     else
                     {
-                        _m.insert({now[i], *pos});
-                        delete now[i];
+                        spgroup[unionid[cpos->second]].push_back(st);
+                    }
+                }
+                if (spgroup.size() == 1)
+                {
+                    spgroup.clear();
+                }
+                else
+                {
+                    flag = true;
+                    for (auto&& i : spgroup)
+                    {
+                        lastUnionId++;
+                        for (auto&& j : i.second)
+                        {
+                            unionid[j] = lastUnionId;
+                        }
+                        group.insert({lastUnionId, move(i.second)});
+                        _stack.push(lastUnionId);
+                    }
+                    break;
+                }
+            }
+            if (not flag)
+            {
+                auto startpos = lower_bound(begin(pos->second), end(pos->second), DStart);
+                if (startpos != pos->second.end() and *startpos == DStart)
+                {
+                    ;
+                }
+                else
+                {
+                    startpos = pos->second.begin();
+                }
+                for (auto&& i : pos->second)
+                {
+                    if (i != *startpos)
+                    {
+                        _m[i] = *startpos;
+                        delete i;
                         stateNum--;
                     }
                 }
-                s.pop();
-            }
-            else
-            {
-                s.pop();
-                s.push(move(remain));
-                s.push(move(sp));
             }
         }
         dfsRebuild(DStart, _m);
