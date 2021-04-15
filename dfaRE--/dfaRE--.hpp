@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cstring>
 #include <map>
+#include <set>
 #include <vector>
 namespace RE
 {
@@ -17,7 +18,6 @@ class dfaRE : protected RE::nfaRE
         std::vector<State*> n;
         bool searched;
     } * DStart;
-    size_t stateNum;
     std::unordered_set<int> charset;
 
     bool useNfa;
@@ -77,7 +77,6 @@ class dfaRE : protected RE::nfaRE
             if (pos == allDState.end())
             {
                 DState* ndsta = new DState({{}, std::move(arr), false});
-                stateNum++;
                 allDState.insert({&(ndsta->n), ndsta});
                 dsta->m[i->c] = ndsta;
             }
@@ -93,7 +92,101 @@ class dfaRE : protected RE::nfaRE
             if (not i.second->searched)
                 buildDfa(i.second);
         }
-        dsta->searched = false;
+    }
+    void minimizeDfa()
+    {
+        if (false)
+            return;
+        using namespace std;
+        unordered_map<DState*, DState*> _m;
+
+        unordered_map<DState*, int> unionid;
+
+        set<vector<DState*>> _set;
+
+        vector<DState*> ac, nac;
+        for (auto&& i : allDState)
+        {
+            if (binary_search(begin(i.second->n), end(i.second->n), &Accept))
+                ac.push_back(i.second), unionid[i.second] = 0;
+            else
+                nac.push_back(i.second), unionid[i.second] = 1;
+        }
+        sort(begin(ac), end(ac));
+        sort(begin(nac), end(nac));
+        _set.insert(move(ac));
+        _set.insert(move(nac));
+        unordered_map<int, vector<DState*>> spgroup;
+        int lastUnionId = 1;
+        while (true)
+        {
+            bool flag  = false;
+            auto _next = _set.begin();
+            for (auto fir = _set.begin(); fir != _set.end(); fir = _next)
+            {
+                _next = ++fir;
+                --fir;
+                auto&& subset = *fir;
+                spgroup.clear();
+                for (auto&& ch : charset)
+                {
+                    for (auto&& st : subset)
+                    {
+                        auto cpos = st->m.find(ch);
+                        if (cpos == st->m.end())
+                        {
+                            spgroup[-1].push_back(st);
+                        }
+                        else
+                        {
+                            spgroup[unionid[cpos->second]].push_back(st);
+                        }
+                    }
+                    if (spgroup.size() == 1)
+                    {
+                        spgroup.clear();
+                    }
+                    else
+                    {
+                        flag = true;
+                        for (auto&& i : spgroup)
+                        {
+                            lastUnionId++;
+                            for (auto&& j : i.second)
+                            {
+                                unionid[j] = lastUnionId;
+                            }
+                            _set.insert(move(i.second));
+                        }
+                        _set.erase(fir);
+                        break;
+                    }
+                }
+            }
+            if (not flag)
+                break;
+        }
+        for (auto&& subset : _set)
+        {
+            if (subset.size() == 1)
+                _m[subset.front()] = subset.front();
+            else
+            {
+                auto startpos = lower_bound(begin(subset), end(subset), DStart);
+                if (not(startpos != subset.end() and *startpos == DStart))
+                    startpos = subset.begin();
+                for (auto&& i : subset)
+                {
+                    _m[i] = *startpos;
+                    if (i != *startpos)
+                    {
+                        allDState.erase(&(i->n));
+                        delete i;
+                    }
+                }
+            }
+        }
+        dfsRebuild(DStart, _m);
     }
 
     void minilizeDfa()
@@ -122,7 +215,7 @@ class dfaRE : protected RE::nfaRE
         int lastUnionId = 1;
         stack<int> _stack;
         _stack.push(0);
-        _stack.push(1);
+        _stack.push(1); // ! bug
         while (not _stack.empty())
         {
             auto nowid = _stack.top();
@@ -168,27 +261,22 @@ class dfaRE : protected RE::nfaRE
                         group.insert({lastUnionId, move(i.second)});
                         _stack.push(lastUnionId);
                     }
+                    group.erase(nowid);
                     break;
                 }
             }
             if (not flag)
             {
                 auto startpos = lower_bound(begin(pos->second), end(pos->second), DStart);
-                if (startpos != pos->second.end() and *startpos == DStart)
-                {
-                    ;
-                }
-                else
-                {
+                if (not(startpos != pos->second.end() and *startpos == DStart))
                     startpos = pos->second.begin();
-                }
                 for (auto&& i : pos->second)
                 {
+                    _m[i] = *startpos;
                     if (i != *startpos)
                     {
-                        _m[i] = *startpos;
+                        allDState.erase(&(i->n));
                         delete i;
-                        stateNum--;
                     }
                 }
             }
@@ -197,17 +285,13 @@ class dfaRE : protected RE::nfaRE
     }
     void dfsRebuild(DState* now, std::unordered_map<DState*, DState*>& rep)
     {
-        using namespace std;
-        if (now == nullptr)
-            return;
-        now->searched = true;
+        now->searched = false;
         for (auto&& i : now->m)
         {
             i.second = rep[i.second];
-            if (not i.second->searched)
+            if (i.second->searched)
                 dfsRebuild(i.second, rep);
         }
-        now->searched = false;
     }
 
     std::vector<std::pair<size_t, size_t>> nonGreadySearch(const std::string& str)
@@ -304,7 +388,6 @@ class dfaRE : protected RE::nfaRE
   public:
     dfaRE(const size_t maxdstate = 128)
     {
-        stateNum       = 0;
         useNfa         = false;
         MAXDSTATELIMIT = maxdstate;
         DStart         = nullptr;
@@ -312,14 +395,12 @@ class dfaRE : protected RE::nfaRE
     dfaRE(const std::string& rex, const size_t maxdstate = 128)
         : nfaRE(rex)
     {
-        stateNum       = 0;
         useNfa         = false;
         MAXDSTATELIMIT = maxdstate;
         std::vector<State*> arr;
         addState2(Start, arr);
         std::sort(begin(arr), end(arr));
         DStart = new DState({{}, std::move(arr), false});
-        stateNum++;
         allDState.insert({&(DStart->n), DStart});
         buildDfa(DStart);
         if (useNfa)
@@ -330,19 +411,20 @@ class dfaRE : protected RE::nfaRE
         }
         else
         {
-            minilizeDfa();
+            auto before = allDState.size();
+            // std::cout << "Befor minilize: " << allDState.size() << std::endl;
+            // minilizeDfa();
+            minimizeDfa();
+            std::cout << "After minilize: " << before - allDState.size() << std::endl;
         }
     }
     ~dfaRE()
     {
-        std::cout << "dfa:" << stateNum << std::endl;
         for (auto&& i : allDState)
             delete i.second;
     }
     void assign(const std::string& rex)
     {
-        std::cout << "dfa:" << stateNum << std::endl;
-        stateNum = 0;
         for (auto&& i : allDState)
             delete i.second;
         std::map<std::vector<State*>*, DState*, mcmp>().swap(allDState);
@@ -354,7 +436,6 @@ class dfaRE : protected RE::nfaRE
         addState2(Start, arr);
         std::sort(begin(arr), end(arr));
         DStart = new DState({{}, std::move(arr), false});
-        stateNum++;
         allDState.insert({&(DStart->n), DStart});
         buildDfa(DStart);
         if (useNfa)
@@ -365,7 +446,11 @@ class dfaRE : protected RE::nfaRE
         }
         else
         {
-            minilizeDfa();
+            auto before = allDState.size();
+            // std::cout << "Befor minilize: " << allDState.size() << std::endl;
+            // minilizeDfa();
+            minimizeDfa();
+            std::cout << "After minilize: " << before - allDState.size() << std::endl;
         }
     }
     bool match(const std::string& str)

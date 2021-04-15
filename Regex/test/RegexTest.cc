@@ -52,6 +52,9 @@ int main(void)
     // searchTest("aaa", "abcaaaaaaa");
     // searchTest(".*", "abcaaaaaaa");
     // searchTest("[\\d]{2}", "abc123123aaa21aa1aa");
-    RE::Regex re("(ab)*(a*|b*)(ba)*");
+    RE::Regex re;
+    re.assign("(a*)(b|abc)");
+    assert(re.match("abc"));
+    cout << 1 << endl;
     return 0;
 }

@@ -37,7 +37,7 @@ signed main(void)
     // searchTest("ab|cd", "abcdhfcd");
     // searchTest("aa*", "abcaaaaaaa");
     // searchTest("aaa", "abcaaaaaaa");
-    RE::dfaRE re("(ab)*(a*|b*)(ba)*");
-    cout << re.match("abaacaaaaba");
+    RE::dfaRE re("[a-z]+@com");
+    cout << re.match("asd@com");
     return 0;
 }

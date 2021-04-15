@@ -47,7 +47,7 @@ void rexTest(const string& s)
             cnt++;
     }
     fs.close();
-    cout << s << ' ' << cnt << '/' << linenum << " cases Done and No error!" << endl;
+    cout << s << ' ' << cnt << '/' << linenum << " cases Done!" << endl;
 }
 
 void searchTest(const std::string& rex, const std::string& source, bool flag = true)
