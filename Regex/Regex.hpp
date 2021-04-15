@@ -12,17 +12,7 @@ namespace RE
 {
 class Regex : protected RE::dfaRE
 {
-    /*
-    * [xyz] (x|y|z)
-    * [0-3] (0|1|2|3)
-    * [0-2a-c] (0|1|2|a|b|c)
-    * \w [A-Za-z0-9_]
-    * a{3} aaa
-    * a{3,5} aaa|aaaa|aaaaa
-    * ||转义...
-    * \d  [0-9]
-    * \n char(10)
-    */
+
   protected:
     std::string parse(const std::string& source);
     std::string parse2(const std::string& src);
@@ -45,9 +35,9 @@ class Regex : protected RE::dfaRE
     {
         return dfaRE::match(tar);
     }
-    std::vector<std::pair<size_t, size_t>> search(const std::string& str,bool isGreadySearch = true)
+    std::vector<std::pair<size_t, size_t>> search(const std::string& str, bool isGreadySearch = true)
     {
-        return dfaRE::search(str,isGreadySearch);
+        return dfaRE::search(str, isGreadySearch);
     }
 };
 

@@ -3,12 +3,13 @@
 * Head File
 *
 * @author:delta-in-hub
-* @date:2021/04/07
 * https://github.com/Delta-in-hub/RE--
 */
 #ifndef __REGEX
 #define __REGEX
+#include <ciso646>
 #include <map>
+#include <set>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -75,12 +76,15 @@ class dfaRE : protected nfaRE
         bool operator()(const std::vector<State*>* a, const std::vector<State*>* b) const;
     };
     bool useNfa;
+    std::unordered_set<int> charset;
 
     std::map<std::vector<State*>*, DState*, mcmp> allDState;
     void addState2(State* s, std::vector<State*>& stateSet);
     void buildDfa(DState* dsta);
     std::vector<std::pair<size_t, size_t>> greadySearch(const std::string& target);
     std::vector<std::pair<size_t, size_t>> nonGreadySearch(const std::string& target);
+    void dfsRebuild(DState* now, std::unordered_map<DState*, DState*>& rep);
+    void minimizeDfa();
 
   public:
     dfaRE(const size_t maxdstate = 64);

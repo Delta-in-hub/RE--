@@ -407,6 +407,8 @@ void __BASERE__::dfaRE::buildDfa(DState* dsta)
         if (vis[i->c])
             continue;
         vis[i->c] = true;
+        if (i->c != Match)
+            charset.insert(i->c);
         std::vector<State*> arr;
         for (auto&& j : dsta->n)
         {
@@ -437,6 +439,112 @@ void __BASERE__::dfaRE::buildDfa(DState* dsta)
             buildDfa(i.second);
     }
 }
+void __BASERE__::dfaRE::minimizeDfa()
+{
+    if (false)
+        return;
+    using namespace std;
+    unordered_map<DState*, DState*> _m;
+
+    unordered_map<DState*, int> unionid;
+
+    set<vector<DState*>> _set;
+
+    vector<DState*> ac, nac;
+    for (auto&& i : allDState)
+    {
+        if (binary_search(begin(i.second->n), end(i.second->n), &Accept))
+            ac.push_back(i.second), unionid[i.second] = 0;
+        else
+            nac.push_back(i.second), unionid[i.second] = 1;
+    }
+    sort(begin(ac), end(ac));
+    sort(begin(nac), end(nac));
+    _set.insert(move(ac));
+    _set.insert(move(nac));
+    unordered_map<int, vector<DState*>> spgroup;
+    int lastUnionId = 1;
+    while (true)
+    {
+        bool flag  = false;
+        auto _next = _set.begin();
+        for (auto fir = _set.begin(); fir != _set.end(); fir = _next)
+        {
+            _next = ++fir;
+            --fir;
+            auto&& subset = *fir;
+            spgroup.clear();
+            for (auto&& ch : charset)
+            {
+                for (auto&& st : subset)
+                {
+                    auto cpos = st->m.find(ch);
+                    if (cpos == st->m.end())
+                    {
+                        spgroup[-1].push_back(st);
+                    }
+                    else
+                    {
+                        spgroup[unionid[cpos->second]].push_back(st);
+                    }
+                }
+                if (spgroup.size() == 1)
+                {
+                    spgroup.clear();
+                }
+                else
+                {
+                    flag = true;
+                    for (auto&& i : spgroup)
+                    {
+                        lastUnionId++;
+                        for (auto&& j : i.second)
+                        {
+                            unionid[j] = lastUnionId;
+                        }
+                        _set.insert(move(i.second));
+                    }
+                    _next = _set.erase(fir);
+                    break;
+                }
+            }
+        }
+        if (not flag)
+            break;
+    }
+    for (auto&& subset : _set)
+    {
+        if (subset.size() == 1)
+            _m[subset.front()] = subset.front();
+        else
+        {
+            auto startpos = lower_bound(begin(subset), end(subset), DStart);
+            if (not(startpos != subset.end() and *startpos == DStart))
+                startpos = subset.begin();
+            for (auto&& i : subset)
+            {
+                _m[i] = *startpos;
+                if (i != *startpos)
+                {
+                    allDState.erase(&(i->n));
+                    delete i;
+                }
+            }
+        }
+    }
+    dfsRebuild(DStart, _m);
+}
+
+void __BASERE__::dfaRE::dfsRebuild(DState* now, std::unordered_map<DState*, DState*>& rep)
+{
+    now->searched = false;
+    for (auto&& i : now->m)
+    {
+        i.second = rep[i.second];
+        if (i.second->searched)
+            dfsRebuild(i.second, rep);
+    }
+}
 
 __BASERE__::dfaRE::dfaRE(const size_t maxdstate)
 {
@@ -461,6 +569,10 @@ __BASERE__::dfaRE::dfaRE(const std::string& rex, const size_t maxdstate)
         for (auto&& i : allDState)
             delete i.second;
         std::map<std::vector<State*>*, DState*, mcmp>().swap(allDState);
+    }
+    else
+    {
+        minimizeDfa();
     }
 }
 
@@ -488,6 +600,10 @@ void __BASERE__::dfaRE::assign(const std::string& rex)
         for (auto&& i : allDState)
             delete i.second;
         std::map<std::vector<State*>*, DState*, mcmp>().swap(allDState);
+    }
+    else
+    {
+        minimizeDfa();
     }
 }
 
